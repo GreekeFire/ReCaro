@@ -120,7 +120,7 @@ On each researcher submission:
 
 #### Submission QC Flags (runs at submission time)
 Writes to column O. Flags:
-- Title under 20 or over 80 characters
+- Title under 190 or over 225 words
 - Description under 100 characters
 - Source cost is zero, blank, or non-numeric
 - Drive folder link doesn't contain `drive.google.com`
