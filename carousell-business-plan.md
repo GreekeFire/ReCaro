@@ -61,7 +61,7 @@ Quinn has ~1,200 existing listings on Carousell, some good and some needing fixi
 
 ### Google Sheet — "Carousell Business Master Sheet"
 
-**Submissions tab** (14 columns):
+**Submissions tab** (13 columns):
 | Column | Field | Notes |
 |--------|-------|-------|
 | A | Timestamp | Auto |
@@ -77,8 +77,6 @@ Quinn has ~1,200 existing listings on Carousell, some good and some needing fixi
 | K | Carousell URL | Entered by lister on completion |
 | L | Date Posted | Auto on completion |
 | M | Notes | Lister flag reason or QC notes |
-| N | Listed Price | Entered by lister on completion |
-| O | QC Flag | Auto-populated by submission QC checks |
 
 **Config tab** (owner-managed):
 | Column | Field |
@@ -89,7 +87,7 @@ Quinn has ~1,200 existing listings on Carousell, some good and some needing fixi
 | D | Status (Active / Inactive) |
 | E | Rejection Count (auto-incremented) |
 
-**Dashboard tab:** COUNTIFS tracking daily submissions and completions per VA vs their Config target. Green/red status indicators.
+**Dashboard tab:** Script-generated. Apps Script calculates daily submissions and completions per VA vs their Config target, then writes a formatted table with green/red status indicators. Refreshes hourly via time trigger.
 
 **Archive tab:** Auto-populated by weekly script. Stores completed rows older than 7 days.
 
@@ -118,9 +116,9 @@ On each researcher submission:
 4. Write lister code to column I automatically
 5. Quinn can manually override column I at any time
 
-#### Submission QC Flags (runs at submission time)
-Writes to column O. Flags:
-- Title under 190 or over 225 words
+#### Submission QC (runs at submission time)
+Hard-reject — bad submissions are never written to the sheet. Checks:
+- Title under 190 or over 225 characters
 - Description under 100 characters
 - Source cost is zero, blank, or non-numeric
 - Drive folder link doesn't contain `drive.google.com`
@@ -128,9 +126,9 @@ Writes to column O. Flags:
 
 #### Lister Completion Validation
 When lister submits a completed listing:
+- Lister code validated against Config tab — inactive or unknown codes are rejected
 - Carousell URL must start with `https://www.carousell.sg/` — rejected with error if not
-- Listed price must be numeric and greater than zero
-- On valid submission: status → Done, Date Posted → today, URL and price written to sheet
+- On valid submission: status → Done, Date Posted → today, URL written to sheet
 
 #### Rejection Counter
 When a lister flags a submission:
@@ -172,6 +170,9 @@ All files have the Apps Script URL baked in. No editing needed — rename to ind
 | `lister-queue.html?lister=LVA001` | Self-serve task queue with full submission details | Lister VAs |
 | `listing-price-calculator.html` | Enter source cost, get sell price with rule shown | All VAs |
 | `researcher-sop.html` | Interactive SOP with copy-paste AI prompts | Researcher VAs |
+| `lister-sop.html` | Interactive SOP for lister workflow | Lister VAs |
+| `trial-researcher.html` | 5-product paid trial submission form for researcher candidates | Candidates |
+| `trial-lister.html` | 3-listing paid trial submission form for lister candidates | Candidates |
 
 ---
 

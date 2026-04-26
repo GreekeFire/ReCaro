@@ -369,11 +369,11 @@
     <div class="field">
       <label for="title">
         Product Title <span class="req">*</span>
-        <span class="char-count" id="title-count">0 / 225 words</span>
+        <span class="char-count" id="title-count">0 / 225 chars</span>
       </label>
-      <input type="text" id="title" name="title" maxlength="100"
+      <input type="text" id="title" name="title" maxlength="225"
         placeholder="e.g. Stainless Steel Kitchen Knife Set with Wooden Block (5pcs)">
-      <div class="hint">190–225 words. Be specific — include material, quantity, and key feature.</div>
+      <div class="hint">190–225 characters. Be specific — include material, quantity, and key feature.</div>
     </div>
 
     <!-- Description -->
@@ -445,15 +445,11 @@
   document.getElementById("va-display").textContent = VA_CODE;
 
   // ── Character counters ────────────────────────────────────────
-  function wordCount(str) {
-    return str.trim() === "" ? 0 : str.trim().split(/\s+/).length;
-  }
-
   function updateTitleCount() {
     const el = document.getElementById("title");
-    const n  = wordCount(el.value);
+    const n  = el.value.length;
     const cc = document.getElementById("title-count");
-    cc.textContent = `${n} / 225 words`;
+    cc.textContent = `${n} / 225 chars`;
     if (n === 0)           { cc.className = "char-count"; }
     else if (n < 190)      { cc.className = "char-count warn"; }
     else if (n <= 225)     { cc.className = "char-count ok"; }
@@ -508,10 +504,9 @@
 
     const errors = [];
 
-    const titleWords = wordCount(title);
     if (!title)                        errors.push("Title is required.");
-    else if (titleWords < 190)         errors.push(`Title is too short — ${titleWords} words, minimum 190.`);
-    else if (titleWords > 225)         errors.push(`Title is too long — ${titleWords} words, maximum 225.`);
+    else if (title.length < 190)       errors.push(`Title is too short — ${title.length} characters, minimum 190.`);
+    else if (title.length > 225)       errors.push(`Title is too long — ${title.length} characters, maximum 225.`);
 
     if (!description)               errors.push("Description is required.");
     else if (description.length < 100) errors.push("Description is too short — minimum 100 characters.");

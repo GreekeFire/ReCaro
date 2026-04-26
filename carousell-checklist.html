@@ -384,8 +384,8 @@
       <div class="task build" data-id="p0-5">
         <div class="checkbox"><span class="checkmark">✓</span></div>
         <div class="task-body">
-          <div class="task-label">Build Submissions tab — 15 columns</div>
-          <div class="task-note">Timestamp, VA Code, Title, Description, Shopee Link, Source Cost, Drive Folder, Sell Price, Assigned Lister, Status, Carousell URL, Date Posted, Notes, Listed Price, QC Flag</div>
+          <div class="task-label">Build Submissions tab — 13 columns</div>
+          <div class="task-note">Timestamp, VA Code, Title, Description, Shopee Link, Source Cost, Drive Folder, Sell Price, Assigned Lister, Status, Carousell URL, Date Posted, Notes</div>
         </div>
         <div class="badge badge-build">BUILD</div>
       </div>
@@ -442,7 +442,7 @@
         <div class="checkbox"><span class="checkmark">✓</span></div>
         <div class="task-body">
           <div class="task-label">Build submission QC flag logic</div>
-          <div class="task-note">On each submission: check title length (190–225 words), description length (100+ chars), source cost numeric + non-zero, Drive URL contains drive.google.com, Shopee URL not duplicate in Submissions + Archive tabs. Write result to QC Flag column.</div>
+          <div class="task-note">On each submission: check title length (190–225 characters), description length (100+ chars), source cost numeric + non-zero, Drive URL contains drive.google.com, Shopee URL not duplicate in Submissions + Archive tabs. Hard-reject — bad submissions are never written to the sheet.</div>
         </div>
         <div class="badge badge-build">BUILD</div>
       </div>
@@ -469,7 +469,7 @@
         <div class="checkbox"><span class="checkmark">✓</span></div>
         <div class="task-body">
           <div class="task-label">Build lister completion endpoint (?action=complete)</div>
-          <div class="task-note">Accepts: row ID, Carousell URL, listed price. Validates: Carousell URL starts with https://www.carousell.sg/, listed price is numeric + non-zero. On valid: status → Done, writes URL, listed price, today's date.</div>
+          <div class="task-note">Accepts: row ID, Carousell URL, lister code. Validates: Carousell URL starts with https://www.carousell.sg/. On valid: status → Done, writes URL and today's date.</div>
         </div>
         <div class="badge badge-build">BUILD</div>
       </div>
