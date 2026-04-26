@@ -279,7 +279,7 @@ Shopee description:
 
       <div class="prompt-block">
         <div class="prompt-label">Title Prompt — run after you have the description</div>
-        <div class="prompt-text" id="title-prompt">Write a Carousell listing title for this product. Requirements: 20–80 characters, no special characters, no all-caps words, no price, no emojis, natural English, keyword-rich but not stuffed.
+        <div class="prompt-text" id="title-prompt">Write a Carousell listing title for this product. Requirements: 190–225 characters, no special characters, no all-caps words, no price, no emojis, natural English, keyword-rich but not stuffed.
 
 Product description:
 [PASTE DESCRIPTION HERE]<button class="copy-btn" onclick="copyPrompt('title-prompt', this)">Copy</button></div>
@@ -347,10 +347,10 @@ Product description:
           <div class="field">
             <div class="char-row">
               <label>Title</label>
-              <span class="char-count bad" id="tc-${i}">0 chars · need 20–80</span>
+              <span class="char-count bad" id="tc-${i}">0 chars · need 190–225</span>
             </div>
-            <input type="text" id="title${i}" maxlength="100"
-                   placeholder="Product title (20–80 characters)"
+            <input type="text" id="title${i}" maxlength="225"
+                   placeholder="Product title (190–225 characters)"
                    oninput="onTitleInput(${i})">
           </div>
 
@@ -398,8 +398,8 @@ Product description:
   function onTitleInput(i) {
     const val = document.getElementById(`title${i}`).value;
     const el  = document.getElementById(`tc-${i}`);
-    const ok  = val.length >= 20 && val.length <= 80;
-    el.textContent = `${val.length} chars · ${ok ? '✓' : 'need 20–80'}`;
+    const ok  = val.length >= 190 && val.length <= 225;
+    el.textContent = `${val.length} chars · ${ok ? '✓' : 'need 190–225'}`;
     el.className   = 'char-count ' + (ok ? 'ok' : 'bad');
     checkCard(i);
   }
@@ -435,7 +435,7 @@ Product description:
     const drive  = document.getElementById(`driveFolder${i}`).value.trim();
 
     const complete =
-      title.length >= 20 && title.length <= 80 &&
+      title.length >= 190 && title.length <= 225 &&
       desc.length >= 100 &&
       link.length > 0 &&
       !isNaN(cost) && cost > 0 &&
