@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Researcher VA — Standard Operating Procedure</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --blue: #60a5fa;
+    --text: #e8e8e8;
+    --muted: #666;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 20px 100px;
+    line-height: 1.6;
+  }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Header ── */
+  header { margin-bottom: 48px; }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  /* ── Role brief ── */
+  .role-brief {
+    margin-top: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .brief-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .brief-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .brief-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .brief-value.accent { color: var(--accent); font-weight: 600; }
+
+  /* ── Table of contents ── */
+  .toc {
+    margin-top: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+  }
+
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px;
+    list-style: none;
+  }
+
+  .toc-list a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+
+  .toc-list a:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* ── Steps ── */
+  .step {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .step-title-block { flex: 1; }
+
+  .step-title {
+    font-family: var(--mono);
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+
+  .step-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* ── Instruction blocks ── */
+  .instruction { margin-bottom: 20px; }
+
+  .instruction p {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .instruction ol, .instruction ul {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .instruction li { font-size: 14px; color: var(--text); }
+
+  .instruction strong { color: #fff; font-weight: 600; }
+
+  /* ── Notice boxes ── */
+  .notice {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .notice-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .notice-body { flex: 1; }
+  .notice-body strong { display: block; margin-bottom: 3px; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; font-family: var(--mono); }
+
+  .notice.warn {
+    background: rgba(234,179,8,0.07);
+    border: 1px solid rgba(234,179,8,0.2);
+    color: #fde68a;
+  }
+  .notice.warn strong { color: var(--yellow); }
+
+  .notice.danger {
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5;
+  }
+  .notice.danger strong { color: var(--red); }
+
+  .notice.success {
+    background: rgba(34,197,94,0.07);
+    border: 1px solid rgba(34,197,94,0.2);
+    color: #86efac;
+  }
+  .notice.success strong { color: var(--green); }
+
+  .notice.info {
+    background: rgba(96,165,250,0.07);
+    border: 1px solid rgba(96,165,250,0.2);
+    color: #bfdbfe;
+  }
+  .notice.info strong { color: var(--blue); }
+
+  /* ── Do / Don't lists ── */
+  .do-dont {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  @media (max-width: 560px) { .do-dont { grid-template-columns: 1fr; } }
+
+  .do-list, .dont-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+
+  .do-list { border-top: 2px solid var(--green); }
+  .dont-list { border-top: 2px solid var(--red); }
+
+  .do-list-title, .dont-list-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .do-list-title { color: var(--green); }
+  .dont-list-title { color: var(--red); }
+
+  .do-list ul, .dont-list ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .do-list li, .dont-list li {
+    font-size: 13px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .do-list li::before { content: "✓"; color: var(--green); flex-shrink: 0; font-weight: 700; }
+  .dont-list li::before { content: "✗"; color: var(--red); flex-shrink: 0; font-weight: 700; }
+
+  /* ── Image placeholder ── */
+  .img-wrap {
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .img-placeholder {
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: 4px;
+    padding: 32px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .img-placeholder img {
+    max-width: 100%;
+    border-radius: 3px;
+    display: block;
+  }
+
+  .img-placeholder.has-image {
+    padding: 0;
+    border-style: solid;
+    overflow: hidden;
+  }
+
+  .img-placeholder-icon { font-size: 24px; opacity: 0.3; }
+
+  .img-placeholder-filename {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .img-placeholder-desc {
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 360px;
+  }
+
+  .img-caption {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* ── Prompt box ── */
+  .prompt-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .prompt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .prompt-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 5px 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(249,115,22,0.3);
+    background: rgba(249,115,22,0.08);
+    color: var(--accent);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .copy-btn:hover { background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.5); }
+  .copy-btn.copied { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: var(--green); }
+
+  .prompt-text {
+    padding: 16px;
+    font-size: 13px;
+    color: #c8c8c8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.65;
+    font-family: var(--sans);
+    user-select: text;
+  }
+
+  /* ── Category grid ── */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .category-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .category-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  /* ── Numbered instruction rows ── */
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .step-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .step-row-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-row-body { flex: 1; }
+
+  .step-row-body p { font-size: 14px; margin: 0; }
+
+  .step-row-body .note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ── Inline code ── */
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(249,115,22,0.1);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* ── Example box ── */
+  .example {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .example strong { color: var(--text); font-size: 12px; font-family: var(--mono); letter-spacing: 0.06em; display: block; margin-bottom: 6px; text-transform: uppercase; }
+
+  /* ── Pre-submission checklist ── */
+  .checklist-section {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .checklist-header {
+    margin-bottom: 24px;
+  }
+
+  .checklist-title {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .checklist-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .checklist-progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+
+  .checklist-count {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .checklist-count span {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .bar-outer {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.35s ease;
+  }
+
+  .checklist-pct {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .check-group {
+    margin-bottom: 20px;
+  }
+
+  .check-group-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 0;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 4px;
+  }
+
+  .check-item:hover { border-color: #3a3a3a; background: var(--surface2); }
+
+  .check-item.done {
+    border-color: rgba(34,197,94,0.2);
+    background: rgba(34,197,94,0.04);
+  }
+
+  .check-item.done .check-label {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: rgba(102,102,102,0.4);
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .check-item.done .checkbox {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .checkmark { display: none; color: #000; font-size: 11px; font-weight: 700; }
+  .check-item.done .checkmark { display: block; }
+
+  .check-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    transition: color 0.15s;
+    flex: 1;
+  }
+
+  .check-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 300;
+  }
+
+  .ready-badge {
+    display: none;
+    margin-top: 20px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 4px;
+    padding: 16px 20px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--green);
+    letter-spacing: 0.05em;
+  }
+
+  .reset-btn {
+    display: block;
+    margin: 32px auto 0;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { border-color: #444; color: var(--text); }
+
+  /* ── Divider ── */
+  .section-divider {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 0;
+    opacity: 0.5;
+    margin: 24px 0 8px;
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <!-- ══ HEADER ══ -->
+  <header>
+    <div class="header-tag">// CAROUSELL OPS — RESEARCHER VA</div>
+    <h1>Standard Operating<br><span>Procedure</span></h1>
+    <p class="subtitle">Read every word. Follow every step. Do not skip anything.</p>
+
+    <div class="role-brief">
+      <div class="brief-item">
+        <span class="brief-label">Your job</span>
+        <span class="brief-value">Find &amp; prepare products for listing</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">You do NOT</span>
+        <span class="brief-value">Post anything on Carousell yourself</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">Daily target</span>
+        <span class="brief-value accent">20 products / day</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">Time per product</span>
+        <span class="brief-value">~6 minutes</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">Quality check</span>
+        <span class="brief-value">All work is reviewed. Repeated mistakes = termination.</span>
+      </div>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">// Steps in this SOP</div>
+      <ul class="toc-list">
+        <li><a href="#step1"><span class="toc-num">01</span> Find a product on Shopee</a></li>
+        <li><a href="#step2"><span class="toc-num">02</span> Copy the Shopee link</a></li>
+        <li><a href="#step3"><span class="toc-num">03</span> Find the highest price</a></li>
+        <li><a href="#step4"><span class="toc-num">04</span> Save product images</a></li>
+        <li><a href="#step5"><span class="toc-num">05</span> Write the description</a></li>
+        <li><a href="#step6"><span class="toc-num">06</span> Write the title</a></li>
+        <li><a href="#step7"><span class="toc-num">07</span> Create Google Drive folder</a></li>
+        <li><a href="#step8"><span class="toc-num">08</span> Submit the form</a></li>
+        <li><a href="#checklist"><span class="toc-num">✓</span> Pre-submission checklist</a></li>
+      </ul>
+    </div>
+  </header>
+
+
+  <!-- ══ STEP 1 ══ -->
+  <div class="step" id="step1">
+    <div class="step-header">
+      <div class="step-num">STEP 01</div>
+      <div class="step-title-block">
+        <div class="step-title">Find a Product on Shopee Singapore</div>
+        <div class="step-subtitle">Set your filters first. Then find a product.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>Open your web browser and go to <strong>www.shopee.sg</strong></p>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image1.png" alt="Shopee.sg homepage" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image1.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot of the Shopee.sg homepage</div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Singapore only</strong>
+        You must use Shopee Singapore only. Do not use Shopee Philippines, Shopee Malaysia, or any other country. Do not use Lazada or any other website.
+      </div>
+    </div>
+
+    <div class="section-divider">// Setting the filters</div>
+
+    <div class="instruction">
+      <p>Before you search for anything, you must set two filters. This makes sure every product you find ships from Singapore and can be delivered the next day.</p>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>On Shopee.sg, search for a product from the category list below.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>On the results page, look for the filter options on the left side.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body">
+          <p>Turn ON the filter: <strong>Shipped from Singapore</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image2.png" alt="Shipped from Singapore filter" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image2.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot showing "Shipped from Singapore" filter toggled ON</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body">
+          <p>Turn ON the filter: <strong>Next Day Delivery</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image3.png" alt="Next Day Delivery filter" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image3.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot showing "Next Day Delivery" filter toggled ON</div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Do not skip this</strong>
+        Both filters must be ON before you pick any product. If you skip this and submit a product that does not ship from Singapore, it will be rejected and logged against your VA code.
+      </div>
+    </div>
+
+    <div class="section-divider">// What to search for</div>
+
+    <div class="instruction">
+      <p>Open ChatGPT or your approved AI tool. Copy the prompt below, paste it into the AI, and it will give you product ideas to search for.</p>
+    </div>
+
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <span class="prompt-label">// Prompt — Get Product Ideas</span>
+        <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      </div>
+      <div class="prompt-text">I run a reselling business buying from Shopee Singapore and selling on Carousell Singapore with S$20-40 markup. I need you to find profitable products that meet ALL these criteria:
+
+HIGH-MARGIN CATEGORIES (prioritize these):
+1. Home organization & storage solutions
+2. Beauty tools & accessories (NOT skincare)
+3. Pet accessories & toys (NOT food)
+4. Fitness accessories (resistance bands, yoga mats, etc.)
+5. Kitchen gadgets & tools
+6. Car accessories & organizers
+7. Bathroom accessories
+8. Phone/tablet accessories
+9. Travel accessories
+10. Craft & DIY supplies
+
+Give me 10 specific product ideas I can search for on Shopee.sg right now. For each product, tell me what to search and what price range to look for.</div>
+    </div>
+
+    <div class="instruction">
+      <p>Pick one idea from the AI's list, search for it on Shopee.sg with both filters ON, and choose a listing to use.</p>
+    </div>
+
+    <div class="section-divider">// Approved categories</div>
+
+    <div class="category-grid">
+      <div class="category-item"><span class="category-num">01</span> Home Organisation &amp; Storage</div>
+      <div class="category-item"><span class="category-num">02</span> Beauty Tools &amp; Accessories</div>
+      <div class="category-item"><span class="category-num">03</span> Pet Accessories &amp; Toys</div>
+      <div class="category-item"><span class="category-num">04</span> Fitness Accessories</div>
+      <div class="category-item"><span class="category-num">05</span> Kitchen Gadgets &amp; Tools</div>
+      <div class="category-item"><span class="category-num">06</span> Car Accessories &amp; Organisers</div>
+      <div class="category-item"><span class="category-num">07</span> Bathroom Accessories</div>
+      <div class="category-item"><span class="category-num">08</span> Phone / Tablet Accessories</div>
+      <div class="category-item"><span class="category-num">09</span> Travel Accessories</div>
+      <div class="category-item"><span class="category-num">10</span> Craft &amp; DIY Supplies</div>
+    </div>
+
+    <div class="notice warn">
+      <div class="notice-icon">⚠</div>
+      <div class="notice-body">
+        <strong>Not allowed</strong>
+        No skincare, food, supplements, electronics with screens (phones, laptops), or anything requiring a health/safety certification. If you are unsure whether a product is allowed, do not submit it — message your manager first.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 2 ══ -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">STEP 02</div>
+      <div class="step-title-block">
+        <div class="step-title">Copy the Shopee Link</div>
+        <div class="step-subtitle">You need the full URL of the product page.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Click on the product to open the listing page.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Click on the <strong>address bar</strong> at the top of your browser. The full web address will be highlighted.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image4.png" alt="Browser address bar" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image4.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot of browser address bar highlighted on a Shopee product page</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body"><p>Right-click and select <strong>Copy</strong>, or press <code>Ctrl+C</code> (Windows) / <code>Cmd+C</code> (Mac).</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body"><p>Paste the link into your notes. You will need it when you submit the form.</p></div>
+      </div>
+    </div>
+
+    <div class="do-dont">
+      <div class="do-list">
+        <div class="do-list-title">Correct</div>
+        <ul>
+          <li>Link starts with <code>https://shopee.sg/</code></li>
+        </ul>
+      </div>
+      <div class="dont-list">
+        <div class="dont-list-title">Wrong — do not use</div>
+        <ul>
+          <li>Link starts with anything other than <code>https://shopee.sg/</code></li>
+          <li>Link is from Shopee Malaysia, Philippines, etc.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 3 ══ -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">STEP 03</div>
+      <div class="step-title-block">
+        <div class="step-title">Find the Highest Price</div>
+        <div class="step-subtitle">Some products have multiple variants. You must check all of them.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>Some products on Shopee come in different versions — different sizes, colours, or sold as a bundle. Each version may have a different price. You must find and record the <strong>highest</strong> price.</p>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>On the product page, look for any options to select — such as size, colour, quantity, or bundle.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image5.png" alt="Product variant options" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image5.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot showing product size/colour variant buttons on Shopee</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Click through <strong>every single option</strong>. Watch the price displayed on the page change each time.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image6.png" alt="Price changing per variant" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image6.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot showing how the price updates as you click different variants</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body"><p>Write down the <strong>highest price</strong> you saw across all options.</p></div>
+      </div>
+    </div>
+
+    <div class="example">
+      <strong>Example</strong>
+      A storage box comes in Small ($8.90), Medium ($12.90), and Large ($15.90). You must write down <strong>$15.90</strong> — the highest price. Do NOT write the cheapest price. Do NOT write the default price without checking all options first.
+    </div>
+
+    <div class="notice success">
+      <div class="notice-icon">✓</div>
+      <div class="notice-body">
+        <strong>Only one version</strong>
+        If there is only one version of the product with one price, just write down that price and move on.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 4 ══ -->
+  <div class="step" id="step4">
+    <div class="step-header">
+      <div class="step-num">STEP 04</div>
+      <div class="step-title-block">
+        <div class="step-title">Save the Product Images</div>
+        <div class="step-subtitle">Minimum 5 images. Maximum 10. Cover image must be clean.</div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Fewer than 5 images</strong>
+        If the product on Shopee has fewer than 5 images, do not use that product. Go back to Step 1 and find a different product.
+      </div>
+    </div>
+
+    <div class="section-divider">// Which images to save</div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Save product images from the Shopee listing. Save a minimum of <strong>5</strong> and a maximum of <strong>10</strong>. If there are more than 10, pick the 10 clearest ones.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Do <strong>not</strong> save lifestyle photos that show people using the product. Only save photos of the product itself.</p></div>
+      </div>
+    </div>
+
+    <div class="section-divider">// Choosing the cover image</div>
+
+    <div class="instruction">
+      <p>The cover image is the <strong>first image</strong> — the one buyers see before they click. This is the most important image. Choose carefully.</p>
+    </div>
+
+    <div class="do-dont">
+      <div class="do-list">
+        <div class="do-list-title">Good cover image</div>
+        <ul>
+          <li>Clear photo of just the product</li>
+          <li>Clean background — white or plain colour</li>
+          <li>No text or very little text</li>
+          <li>No brand name or logo visible</li>
+          <li>No watermarks</li>
+        </ul>
+      </div>
+      <div class="dont-list">
+        <div class="dont-list-title">Bad cover image</div>
+        <ul>
+          <li>Brand name or logo clearly visible</li>
+          <li>Large text or promotional banners</li>
+          <li>Watermarks anywhere on the image</li>
+          <li>Blurry or dark image</li>
+          <li>Photos showing people using the product</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image7.png" alt="Good cover image example" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image7.png</div>
+        <div class="img-placeholder-desc" style="display:none">Example of a GOOD cover image — clean background, no branding</div>
+      </div>
+      <div class="img-caption">Good cover image</div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image8.png" alt="Bad cover image example" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image8.png</div>
+        <div class="img-placeholder-desc" style="display:none">Example of a BAD cover image — has watermark / brand logo</div>
+      </div>
+      <div class="img-caption">Poor cover image</div>
+    </div>
+
+    <div class="section-divider">// Cleaning the cover image</div>
+
+    <div class="instruction">
+      <p>If the cover image has a watermark or brand name on it, you must remove it before using it.</p>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Go to <strong>cleanup.pictures</strong> in your browser.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image9.png" alt="cleanup.pictures website" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image9.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot of the cleanup.pictures homepage</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Click <strong>Upload Image</strong> and upload the cover image.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body"><p>Use the <strong>brush tool</strong> to paint over the watermark or brand name.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image10.png" alt="cleanup.pictures brush tool" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image10.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot showing the brush tool being used to paint over a watermark</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body"><p>Click <strong>Download</strong> to save the cleaned image.</p></div>
+      </div>
+    </div>
+
+    <div class="notice info">
+      <div class="notice-icon">ℹ</div>
+      <div class="notice-body">
+        <strong>Cover image only</strong>
+        You only need to clean the cover image — the first image. You do not need to clean the other images. Just make sure they are clear photos of the product.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 5 ══ -->
+  <div class="step" id="step5">
+    <div class="step-header">
+      <div class="step-num">STEP 05</div>
+      <div class="step-title-block">
+        <div class="step-title">Write the Product Description</div>
+        <div class="step-subtitle">Use AI to write this. Do the description before the title.</div>
+      </div>
+    </div>
+
+    <div class="notice warn">
+      <div class="notice-icon">⚠</div>
+      <div class="notice-body">
+        <strong>Description before title</strong>
+        You must write the description BEFORE the title. Do not skip ahead. Always do the description first — you will use it to create the title in Step 6.
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>On the Shopee product page, scroll down to find the <strong>product description</strong>. This is where the seller has written about the product.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image11.png" alt="Shopee product description section" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image11.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot showing where to find the product description on a Shopee listing page</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Select all the text in the product description. Copy it with <code>Ctrl+C</code> / <code>Cmd+C</code>.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image12.png" alt="Selecting and copying Shopee description" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image12.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot showing the description text selected and being copied</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body"><p>Open ChatGPT or your approved AI tool in a new tab.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body"><p>Copy the prompt below using the Copy button.</p></div>
+      </div>
+    </div>
+
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <span class="prompt-label">// Prompt — Write Description</span>
+        <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      </div>
+      <div class="prompt-text">You are an expert Carousell listing copywriter. Write a product description that converts browsers to buyers.
+
+STRUCTURE (use this exact format):
+**[Product Name - Hook]**
+[One sentence describing the product and main benefit]
+
+**Why You'll Love It:**
+• [Benefit 1 - what it does for them]
+• [Benefit 2 - emotional/satisfaction]
+• [Benefit 3 - practical/specific]
+• [Benefit 4 - quality/convenience]
+
+**Perfect For:**
+[Specific use cases - who needs this and where they use it]
+
+**What's Included:**
+[List exactly what they get]
+
+**Specifications:**
+• Material: [material]
+• Dimensions: [L x W x H in cm]
+• Weight: [in kg or grams]
+• Color: [available colors]
+
+**Why Buy From Me:**
+✓ Fast Singapore shipping (2-3 days)
+✓ Quality checked before sending
+✓ Secure packaging
+✓ Responsive customer service
+
+**Note:** [Stock status or any important info]
+---
+🎁 DM me for bulk discounts or questions!
+
+TONE GUIDELINES:
+- Friendly but professional
+- Focus on benefits, not just features
+- Use "you" and "your" to connect with buyer
+- Be specific — NO vague claims like "high quality"
+- Total length: 100-150 words
+
+AVOID:
+- "Amazing," "incredible," "best"
+- All caps words
+- Multiple exclamation marks (!!!)
+- Copy-paste from manufacturer
+- Mentioning Shopee, Amazon, or other platforms
+- Including any brand names</div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">5</div>
+        <div class="step-row-body">
+          <p>In the AI chat, paste the prompt first. Then on a new line, paste the Shopee product description you copied. Then press Enter.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image13.png" alt="ChatGPT with prompt and Shopee description pasted" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image13.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot of ChatGPT showing the prompt and Shopee description pasted together</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">6</div>
+        <div class="step-row-body"><p>Wait for the AI to finish. Copy the full description it gives you and save it in your notes.</p></div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Check before saving</strong>
+        If the AI description mentions Shopee, Amazon, Lazada, or any other platform — delete that sentence. If the description includes a brand name — replace it with a general product name. Example: change "Ikea stackable box" to "stackable storage box".
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 6 ══ -->
+  <div class="step" id="step6">
+    <div class="step-header">
+      <div class="step-num">STEP 06</div>
+      <div class="step-title-block">
+        <div class="step-title">Write the Listing Title</div>
+        <div class="step-subtitle">Use the description you just wrote as input for the AI.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Go back to your AI tool. You will continue in the same chat or start a new message.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Copy the prompt below using the Copy button.</p></div>
+      </div>
+    </div>
+
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <span class="prompt-label">// Prompt — Write Title</span>
+        <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      </div>
+      <div class="prompt-text">You are an expert Carousell listing copywriter. Create an SEO-optimized title (maximum 225 characters) for this product.
+
+CAROUSELL TITLE BEST PRACTICES:
+- Front-load important keywords (first 50 chars most visible)
+- Include: [Product Name] | [Key Feature] | [Use Case/Category]
+- Use pipes (|) or dashes (-) to separate keywords
+- Include synonyms and related search terms
+- Capitalize major words (Title Case)
+- NO special characters: ! @ # $ % * &
+- NO emojis in title
+- NO vague words: "nice," "good," "cheap," "best"
+- NO brand names
+
+WHAT BUYERS SEARCH FOR ON CAROUSELL:
+- Style descriptors: "Korean," "Japanese," "Minimalist," "Nordic"
+- Use cases: "Home," "Office," "Travel," "Gift"
+- Qualities: "Portable," "Foldable," "Adjustable," "Waterproof"
+- Materials: "Stainless," "Bamboo," "Silicone," "Acrylic"
+
+FORMAT:
+Product Name | Key Feature | Use Case | Secondary Keywords
+
+IMPORTANT:
+1. Character count must be under 225
+2. Include words buyers actually search for
+3. No filler words like "Brand New"
+4. Make it specific, not generic</div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body">
+          <p>In the AI chat, paste the prompt first. Then on a new line, paste the <strong>description you created in Step 5</strong>. Then press Enter.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/image14.png" alt="ChatGPT generating title from description" onerror="this.parentElement.classList.remove('has-image'); this.style.display='none'; this.parentElement.querySelector('.img-placeholder-icon').style.display='block'; this.parentElement.querySelector('.img-placeholder-filename').style.display='block'; this.parentElement.querySelector('.img-placeholder-desc').style.display='block';">
+        <div class="img-placeholder-icon" style="display:none">📷</div>
+        <div class="img-placeholder-filename" style="display:none">images/image14.png</div>
+        <div class="img-placeholder-desc" style="display:none">Screenshot of ChatGPT generating a title from the description</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body"><p>Copy the title the AI gives you and save it in your notes.</p></div>
+      </div>
+    </div>
+
+    <div class="section-divider">// Check the title before saving</div>
+
+    <div class="do-dont">
+      <div class="do-list">
+        <div class="do-list-title">Title must have all of these</div>
+        <ul>
+          <li>Under 225 characters</li>
+          <li>No brand names</li>
+          <li>No special characters: <code>! @ # $ % * &</code></li>
+          <li>No emojis</li>
+          <li>No vague words: "nice," "good," "cheap," "best"</li>
+        </ul>
+      </div>
+      <div class="dont-list">
+        <div class="dont-list-title">If the title fails any check</div>
+        <ul>
+          <li>Title over 225 chars → type "Please shorten this to under 225 characters" and copy the new one</li>
+          <li>Has brand name → ask AI to remove it and replace with a generic term</li>
+          <li>Has special chars → ask AI to remove them</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 7 ══ -->
+  <div class="step" id="step7">
+    <div class="step-header">
+      <div class="step-num">STEP 07</div>
+      <div class="step-title-block">
+        <div class="step-title">Create Your Google Drive Folder</div>
+        <div class="step-subtitle">One folder per product. Name it exactly as shown below.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body">
+          <p>Open <strong>Google Drive</strong> and create a new folder.</p>
+          <p class="note">You should have a main folder for your VA code already. Create this new product folder inside it.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body">
+          <p>Name the folder using this exact format: <code>[Your VA Code] - [Product Name]</code></p>
+          <div class="example" style="margin-top: 10px;">
+            <strong>Examples</strong>
+            RVA001 - Bamboo Storage Box<br>
+            RVA001 - Silicone Kitchen Spatula Set<br>
+            RVA001 - Foldable Car Boot Organiser
+          </div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body"><p>Upload all your product images into the folder (5–10 images, cleaned cover image first).</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body">
+          <p>Set the folder's sharing to <strong>"Anyone with the link"</strong>.</p>
+          <p class="note">Right-click the folder → Share → Change to "Anyone with the link" → Copy link</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">5</div>
+        <div class="step-row-body"><p>Copy the folder link. You will need it when you submit the form.</p></div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Folder must be shared</strong>
+        If you forget to set sharing to "Anyone with the link," the reviewer will not be able to open it. Your submission will be rejected and logged against your VA code.
+      </div>
+    </div>
+
+    <div class="notice warn">
+      <div class="notice-icon">⚠</div>
+      <div class="notice-body">
+        <strong>Folder link, not file link</strong>
+        Copy the link to the folder, not to an individual image inside it. The folder link starts with <code>https://drive.google.com/drive/folders/</code>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 8 ══ -->
+  <div class="step" id="step8">
+    <div class="step-header">
+      <div class="step-num">STEP 08</div>
+      <div class="step-title-block">
+        <div class="step-title">Submit the Form</div>
+        <div class="step-subtitle">Fill in every field. Do not leave anything blank.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>Open your personal submission form link (the one you were given when you joined). Fill in all fields using the information you collected in Steps 1–7.</p>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body">
+          <p><strong>Product Title</strong> — paste the title from Step 6</p>
+          <p class="note">Must be under 225 characters</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body">
+          <p><strong>Product Description</strong> — paste the description from Step 5</p>
+          <p class="note">Must be at least 100 characters</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body">
+          <p><strong>Shopee Link</strong> — paste the URL from Step 2</p>
+          <p class="note">Must start with https://shopee.sg/</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body">
+          <p><strong>Source Cost</strong> — enter the highest price from Step 3</p>
+          <p class="note">Numbers only, no $ sign</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">5</div>
+        <div class="step-row-body">
+          <p><strong>Drive Folder Link</strong> — paste the Google Drive folder link from Step 7</p>
+          <p class="note">Must be a drive.google.com link, must be set to "Anyone with the link"</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">6</div>
+        <div class="step-row-body">
+          <p>Click <strong>Submit</strong>. Wait for the confirmation message before moving on to your next product.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice success">
+      <div class="notice-icon">✓</div>
+      <div class="notice-body">
+        <strong>On successful submission</strong>
+        The form will show you the calculated sell price and confirm the submission was received. If you see an error message instead, read it carefully and fix the issue before resubmitting.
+      </div>
+    </div>
+
+    <div class="notice info">
+      <div class="notice-icon">ℹ</div>
+      <div class="notice-body">
+        <strong>Your VA code is pre-filled</strong>
+        Your VA code is already filled in on your form. Do not change it. Do not use anyone else's form.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ PRE-SUBMISSION CHECKLIST ══ -->
+  <div class="checklist-section" id="checklist">
+
+    <div class="checklist-header">
+      <div class="checklist-title">// Pre-Submission Checklist</div>
+      <div class="checklist-subtitle">Complete this for every product before you hit Submit. Click each item to tick it off.</div>
+    </div>
+
+    <div class="checklist-progress">
+      <div class="checklist-count">
+        <span id="cl-done">0</span> / <span id="cl-total">0</span>
+        <span>items checked</span>
+      </div>
+      <div class="bar-outer">
+        <div class="bar-inner" id="cl-bar" style="width:0%"></div>
+      </div>
+      <div class="checklist-pct" id="cl-pct">0%</div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Shopee product</div>
+
+      <div class="check-item" data-id="c1">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Both Shopee filters are ON — Shipped from Singapore AND Next Day Delivery</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c2">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Product is from an approved category</div>
+          <div class="check-note">Not skincare, food, supplements, or electronics with screens</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c3">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Shopee link copied — starts with https://shopee.sg/</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c4">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Highest price checked across all variants and recorded</div>
+          <div class="check-note">You clicked through every size, colour, and bundle option</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Images</div>
+
+      <div class="check-item" data-id="c5">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">5 to 10 product images saved</div>
+          <div class="check-note">No lifestyle photos, no people</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c6">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Cover image is clean — no watermarks, no brand logos, no promo banners</div>
+          <div class="check-note">Used cleanup.pictures if needed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Description</div>
+
+      <div class="check-item" data-id="c7">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Description written using the AI prompt</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c8">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Description contains no brand names</div>
+          <div class="check-note">Replace any brand name with a generic product name</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c9">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Description mentions no other platforms — no Shopee, Amazon, Lazada</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Title</div>
+
+      <div class="check-item" data-id="c10">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Title is under 225 characters</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c11">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Title contains no brand names</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c12">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Title contains no special characters or emojis</div>
+          <div class="check-note">No ! @ # $ % * &amp;</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c13">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Title contains no vague words — no "nice," "good," "cheap," "best"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Google Drive folder</div>
+
+      <div class="check-item" data-id="c14">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Folder named correctly — [VA Code] - [Product Name]</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c15">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">All images uploaded to the folder</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c16">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">Folder sharing set to "Anyone with the link" and link copied</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Submission form</div>
+
+      <div class="check-item" data-id="c17">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="check-label">All 5 form fields filled in — title, description, Shopee link, source cost, Drive folder link</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ready-badge" id="ready-badge">
+      ✓ &nbsp; ALL CHECKS COMPLETE — YOU ARE READY TO SUBMIT
+    </div>
+
+    <button class="reset-btn" onclick="resetChecklist()">// RESET CHECKLIST</button>
+
+  </div>
+
+</div>
+
+<script>
+  // ── Copy prompt buttons ──
+  function copyPrompt(btn) {
+    const text = btn.closest('.prompt-box').querySelector('.prompt-text').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => {
+      // Fallback for older browsers
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // ── Image fallback: show placeholder if image fails to load ──
+  document.querySelectorAll('.img-placeholder img').forEach(img => {
+    if (img.complete && img.naturalWidth === 0) {
+      img.dispatchEvent(new Event('error'));
+    }
+  });
+
+  // ── Pre-submission checklist ──
+  const CL_KEY = 'carousell_sop_checklist_v1';
+
+  function getClState() {
+    try { return JSON.parse(localStorage.getItem(CL_KEY)) || {}; } catch { return {}; }
+  }
+
+  function saveClState(state) {
+    localStorage.setItem(CL_KEY, JSON.stringify(state));
+  }
+
+  function updateChecklist() {
+    const all  = document.querySelectorAll('.check-item[data-id]');
+    const done = document.querySelectorAll('.check-item[data-id].done');
+    const total = all.length;
+    const doneCount = done.length;
+    const pct = total ? Math.round(doneCount / total * 100) : 0;
+
+    document.getElementById('cl-done').textContent  = doneCount;
+    document.getElementById('cl-total').textContent = total;
+    document.getElementById('cl-bar').style.width   = pct + '%';
+    document.getElementById('cl-pct').textContent   = pct + '%';
+
+    const badge = document.getElementById('ready-badge');
+    badge.style.display = (doneCount === total && total > 0) ? 'block' : 'none';
+  }
+
+  function initChecklist() {
+    const state = getClState();
+    document.querySelectorAll('.check-item[data-id]').forEach(item => {
+      if (state[item.dataset.id]) item.classList.add('done');
+
+      item.addEventListener('click', () => {
+        const s = getClState();
+        if (item.classList.contains('done')) {
+          item.classList.remove('done');
+          delete s[item.dataset.id];
+        } else {
+          item.classList.add('done');
+          s[item.dataset.id] = true;
+        }
+        saveClState(s);
+        updateChecklist();
+      });
+    });
+    updateChecklist();
+  }
+
+  function resetChecklist() {
+    if (!confirm('Reset checklist for this product?')) return;
+    localStorage.removeItem(CL_KEY);
+    document.querySelectorAll('.check-item.done').forEach(t => t.classList.remove('done'));
+    updateChecklist();
+  }
+
+  initChecklist();
+</script>
+</body>
+</html>

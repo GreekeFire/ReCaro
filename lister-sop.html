@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lister VA — Standard Operating Procedure</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --blue: #60a5fa;
+    --text: #e8e8e8;
+    --muted: #666;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 20px 100px;
+    line-height: 1.6;
+  }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Header ── */
+  header { margin-bottom: 48px; }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  .role-brief {
+    margin-top: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .brief-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .brief-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .brief-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .brief-value.accent { color: var(--accent); font-weight: 600; }
+
+  .toc {
+    margin-top: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+  }
+
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px;
+    list-style: none;
+  }
+
+  .toc-list a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+
+  .toc-list a:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* ── Steps ── */
+  .step {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .step-num.flag-num {
+    color: var(--red);
+    background: rgba(239,68,68,0.1);
+    border-color: rgba(239,68,68,0.2);
+  }
+
+  .step-title-block { flex: 1; }
+
+  .step-title {
+    font-family: var(--mono);
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+
+  .step-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* ── Instruction blocks ── */
+  .instruction { margin-bottom: 20px; }
+
+  .instruction p {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .instruction p:last-child { margin-bottom: 0; }
+
+  .instruction strong { color: #fff; font-weight: 600; }
+
+  /* ── Numbered step rows ── */
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .step-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .step-row-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-row-body { flex: 1; }
+  .step-row-body p { font-size: 14px; margin: 0; }
+  .step-row-body .note { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .step-row-body strong { color: #fff; font-weight: 600; }
+
+  /* ── Notice boxes ── */
+  .notice {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .notice-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .notice-body { flex: 1; }
+  .notice-body strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+
+  .notice.warn  { background: rgba(234,179,8,0.07);  border: 1px solid rgba(234,179,8,0.2);  color: #fde68a; }
+  .notice.warn strong { color: var(--yellow); }
+  .notice.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2);  color: #fca5a5; }
+  .notice.danger strong { color: var(--red); }
+  .notice.success { background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
+  .notice.success strong { color: var(--green); }
+  .notice.info  { background: rgba(96,165,250,0.07); border: 1px solid rgba(96,165,250,0.2); color: #bfdbfe; }
+  .notice.info strong { color: var(--blue); }
+
+  /* ── Do / Don't ── */
+  .do-dont {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  @media (max-width: 560px) { .do-dont { grid-template-columns: 1fr; } }
+
+  .do-list, .dont-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+
+  .do-list   { border-top: 2px solid var(--green); }
+  .dont-list { border-top: 2px solid var(--red); }
+
+  .do-list-title, .dont-list-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .do-list-title   { color: var(--green); }
+  .dont-list-title { color: var(--red); }
+
+  .do-list ul, .dont-list ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .do-list li, .dont-list li {
+    font-size: 13px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .do-list   li::before { content: "✓"; color: var(--green); flex-shrink: 0; font-weight: 700; }
+  .dont-list li::before { content: "✗"; color: var(--red);   flex-shrink: 0; font-weight: 700; }
+
+  /* ── Image placeholder ── */
+  .img-wrap {
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .img-placeholder {
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: 4px;
+    padding: 32px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .img-placeholder img {
+    max-width: 100%;
+    border-radius: 3px;
+    display: block;
+  }
+
+  .img-placeholder.has-image {
+    padding: 0;
+    border-style: solid;
+    overflow: hidden;
+  }
+
+  .img-placeholder-icon     { font-size: 24px; opacity: 0.3; }
+  .img-placeholder-filename { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.08em; }
+  .img-placeholder-desc     { font-size: 12px; color: var(--muted); max-width: 360px; }
+
+  .img-caption { font-size: 12px; color: var(--muted); font-style: italic; text-align: center; }
+
+  /* ── Field row (form field instructions) ── */
+  .field-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .field-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .field-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    min-width: 120px;
+    margin-top: 2px;
+  }
+
+  .field-instruction {
+    font-size: 14px;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .field-instruction .note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .field-instruction strong { color: #fff; font-weight: 600; }
+
+  /* ── Inline code ── */
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(249,115,22,0.1);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* ── Example ── */
+  .example {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .example strong {
+    color: var(--text);
+    font-size: 12px;
+    font-family: var(--mono);
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  /* ── Section divider ── */
+  .section-divider {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 0;
+    opacity: 0.5;
+    margin: 24px 0 8px;
+  }
+
+  /* ── Flag section ── */
+  .flag-section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  .flag-reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .flag-reason {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 4px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .flag-reason-icon {
+    color: var(--red);
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .flag-reason-body { flex: 1; }
+
+  .flag-reason-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .flag-reason-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ── Pre-submission checklist ── */
+  .checklist-section {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+    scroll-margin-top: 24px;
+  }
+
+  .checklist-header { margin-bottom: 24px; }
+
+  .checklist-title {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .checklist-subtitle { font-size: 13px; color: var(--muted); }
+
+  .checklist-progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+
+  .checklist-count {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .checklist-count span {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .bar-outer {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.35s ease;
+  }
+
+  .checklist-pct {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .check-group { margin-bottom: 20px; }
+
+  .check-group-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 0;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 4px;
+  }
+
+  .check-item:hover { border-color: #3a3a3a; background: var(--surface2); }
+
+  .check-item.done {
+    border-color: rgba(34,197,94,0.2);
+    background: rgba(34,197,94,0.04);
+  }
+
+  .check-item.done .check-label {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: rgba(102,102,102,0.4);
+  }
+
+  .checkbox {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .check-item.done .checkbox { background: var(--green); border-color: var(--green); }
+
+  .checkmark { display: none; color: #000; font-size: 11px; font-weight: 700; }
+  .check-item.done .checkmark { display: block; }
+
+  .check-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    transition: color 0.15s;
+    flex: 1;
+  }
+
+  .check-note { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 300; }
+
+  .ready-badge {
+    display: none;
+    margin-top: 20px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 4px;
+    padding: 16px 20px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--green);
+    letter-spacing: 0.05em;
+  }
+
+  .reset-btn {
+    display: block;
+    margin: 32px auto 0;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { border-color: #444; color: var(--text); }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <!-- ══ HEADER ══ -->
+  <header>
+    <div class="header-tag">// CAROUSELL OPS — LISTER VA</div>
+    <h1>Standard Operating<br><span>Procedure</span></h1>
+    <p class="subtitle">Read every word. Follow every step. Do not skip anything.</p>
+
+    <div class="role-brief">
+      <div class="brief-item">
+        <span class="brief-label">Your job</span>
+        <span class="brief-value">Post products on Carousell</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">You do NOT</span>
+        <span class="brief-value">Source products yourself</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">Daily target</span>
+        <span class="brief-value accent">140 listings / day</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">Your tools</span>
+        <span class="brief-value">Your queue page + Carousell</span>
+      </div>
+      <div class="brief-item">
+        <span class="brief-label">Credentials</span>
+        <span class="brief-value">Shared via Telegram only — never write them down</span>
+      </div>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">// Steps in this SOP</div>
+      <ul class="toc-list">
+        <li><a href="#step1"><span class="toc-num">01</span> Open your queue</a></li>
+        <li><a href="#step2"><span class="toc-num">02</span> Download the images</a></li>
+        <li><a href="#step3"><span class="toc-num">03</span> Start a new listing</a></li>
+        <li><a href="#step4"><span class="toc-num">04</span> Upload the images</a></li>
+        <li><a href="#step5"><span class="toc-num">05</span> Select the category</a></li>
+        <li><a href="#step6"><span class="toc-num">06</span> Fill in listing details</a></li>
+        <li><a href="#step7"><span class="toc-num">07</span> Set delivery</a></li>
+        <li><a href="#step8"><span class="toc-num">08</span> Enable Buy Button</a></li>
+        <li><a href="#step9"><span class="toc-num">09</span> Set the price</a></li>
+        <li><a href="#step10"><span class="toc-num">10</span> Post the listing</a></li>
+        <li><a href="#step11"><span class="toc-num">11</span> Mark as done</a></li>
+        <li><a href="#flagging"><span class="toc-num">⚑</span> Flagging a submission</a></li>
+        <li><a href="#checklist"><span class="toc-num">✓</span> Per-listing checklist</a></li>
+      </ul>
+    </div>
+  </header>
+
+
+  <!-- ══ STEP 1 ══ -->
+  <div class="step" id="step1">
+    <div class="step-header">
+      <div class="step-num">STEP 01</div>
+      <div class="step-title-block">
+        <div class="step-title">Open Your Queue</div>
+        <div class="step-subtitle">Your queue shows everything assigned to you. Start here every day.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>Open your personal queue link (the one you were given when you joined). Your queue page only shows tasks assigned to you — no one else's.</p>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image1.png" alt="Queue page" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image1.png</div>
+        <div class="img-placeholder-desc">Screenshot of the queue page showing a list of pending tasks</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>Each task in the queue shows the <strong>product title</strong>, <strong>sell price</strong>, <strong>source cost</strong>, and <strong>margin</strong> at a glance. Click any task to expand it and see everything you need to post the listing.</p>
+    </div>
+
+    <div class="field-list">
+      <div class="field-row">
+        <div class="field-name">Sell Price</div>
+        <div class="field-instruction">The price you will list on Carousell. Do not change it.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Product Title</div>
+        <div class="field-instruction">Copy button included — copies the full title to your clipboard.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Description</div>
+        <div class="field-instruction">Copy button included — copies the full description to your clipboard.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Drive Folder</div>
+        <div class="field-instruction">Link to the product images. Click to open.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Shopee Link</div>
+        <div class="field-instruction">The source product on Shopee. For reference only — do not use for anything else.</div>
+      </div>
+    </div>
+
+    <div class="notice info">
+      <div class="notice-icon">↻</div>
+      <div class="notice-body">
+        <strong>Refreshing the queue</strong>
+        Use the Refresh button at the top of the queue page to reload your task list. Your tasks are prepared the day before — your queue for the day is ready when you start your shift.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 2 ══ -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">STEP 02</div>
+      <div class="step-title-block">
+        <div class="step-title">Download the Images</div>
+        <div class="step-subtitle">All images for the listing are in the Drive folder.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Click the <strong>Drive Folder</strong> link in the expanded task to open it.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body">
+          <p>Check that there are at least <strong>5 images</strong> in the folder.</p>
+          <p class="note">If there are fewer than 5, flag this submission before doing anything else. See the Flagging section.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body"><p>Download all images. Select all files, right-click, and choose Download.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image2.png" alt="Google Drive folder with product images" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image2.png</div>
+        <div class="img-placeholder-desc">Screenshot of a Google Drive folder open with product images inside</div>
+      </div>
+    </div>
+
+    <div class="notice warn">
+      <div class="notice-icon">⚠</div>
+      <div class="notice-body">
+        <strong>Check the cover image</strong>
+        The first image in the folder is the cover image. Before downloading, check that it has no watermarks, brand logos, or promotional banners. If it does, flag the submission. See the Flagging section.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 3 ══ -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">STEP 03</div>
+      <div class="step-title-block">
+        <div class="step-title">Start a New Listing on Carousell</div>
+        <div class="step-subtitle">Log in to the Carousell account and create a new listing.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Open Carousell and log in with the credentials you were given via Telegram.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Tap or click the <strong>Sell</strong> button (the + icon) to start a new listing.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image3.png" alt="Carousell Sell button" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image3.png</div>
+        <div class="img-placeholder-desc">Screenshot showing the Sell / + button on Carousell</div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Credentials are confidential</strong>
+        Never write the Carousell login details anywhere — not in a doc, not in a message, not in your notes. If you need them resent, message your manager on Telegram.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 4 ══ -->
+  <div class="step" id="step4">
+    <div class="step-header">
+      <div class="step-num">STEP 04</div>
+      <div class="step-title-block">
+        <div class="step-title">Upload the Images</div>
+        <div class="step-subtitle">Upload in the correct order. The first image becomes the cover.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>On the new listing screen, you will see a photo upload area. Upload the images in this order:</p>
+    </div>
+
+    <div class="field-list">
+      <div class="field-row">
+        <div class="field-name">1st — Cover</div>
+        <div class="field-instruction"><strong>Clean cover photo</strong> — the main product shot with a plain background. This is the most important image. Upload it first.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">2nd–4th — Details</div>
+        <div class="field-instruction">Product detail shots — angles, close-ups, what's included.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Next — Dimensions</div>
+        <div class="field-instruction">Any images showing size, measurements, or specs.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Last — Variants</div>
+        <div class="field-instruction">Any images showing colour or size options.</div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image4.png" alt="Carousell photo upload screen" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image4.png</div>
+        <div class="img-placeholder-desc">Screenshot of the Carousell photo upload screen with images being added</div>
+      </div>
+    </div>
+
+    <div class="notice info">
+      <div class="notice-icon">ℹ</div>
+      <div class="notice-body">
+        <strong>Reordering photos</strong>
+        On Carousell you can drag photos to reorder them after uploading. The leftmost photo is the cover. Make sure the clean cover image is always in the first position.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 5 ══ -->
+  <div class="step" id="step5">
+    <div class="step-header">
+      <div class="step-num">STEP 05</div>
+      <div class="step-title-block">
+        <div class="step-title">Select the Category</div>
+        <div class="step-subtitle">Carousell will suggest one automatically. Pick the most specific option.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>After uploading images, Carousell will automatically suggest a category based on what it detects in the photos. In most cases this will be correct.</p>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Check the suggested category. If it looks correct for the product, keep it.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body">
+          <p>If the category is wrong or too broad, tap it and select the <strong>most specific</strong> subcategory available.</p>
+          <div class="example" style="margin-top:10px;">
+            <strong>Example</strong>
+            "Home &amp; Living" is too broad. Pick "Home Organisation &amp; Storage" or whichever subcategory best fits the product.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image5.png" alt="Carousell category selector" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image5.png</div>
+        <div class="img-placeholder-desc">Screenshot of Carousell category selection with subcategories shown</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 6 ══ -->
+  <div class="step" id="step6">
+    <div class="step-header">
+      <div class="step-num">STEP 06</div>
+      <div class="step-title-block">
+        <div class="step-title">Fill in the Listing Details</div>
+        <div class="step-subtitle">Copy the title and description directly from your queue page.</div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image6.png" alt="Carousell listing details form" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image6.png</div>
+        <div class="img-placeholder-desc">Screenshot of the Carousell item details form showing title, brand, and description fields</div>
+      </div>
+    </div>
+
+    <div class="field-list">
+      <div class="field-row">
+        <div class="field-name">Condition</div>
+        <div class="field-instruction">
+          Always select <strong>Brand New</strong>. Every product comes from Shopee and has never been used.
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Listing Title</div>
+        <div class="field-instruction">
+          Go to your queue page, open the task, and use the <strong>Copy</strong> button next to the title. Paste it here exactly as copied.
+          <div class="note">Do not retype it — copy and paste only.</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Brand</div>
+        <div class="field-instruction">
+          Select <strong>Others / Unbranded</strong>. Never select a specific brand name.
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Description</div>
+        <div class="field-instruction">
+          Go to your queue page, open the task, and use the <strong>Copy</strong> button next to the description. Paste it here exactly as copied.
+          <div class="note">Read the description quickly before pasting. If it mentions Shopee, Lazada, Amazon, or a brand name — fix it before pasting. See the Flagging section.</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">More than one</div>
+        <div class="field-instruction">
+          Tick the box that says <strong>"I have more than one of the same item"</strong>. Always tick this.
+        </div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Do not edit the title or description</strong>
+        Copy and paste exactly as given in the queue. The only exception is if you spot a brand name or competitor platform mentioned — in that case, remove it, then post. Flag the issue separately.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 7 ══ -->
+  <div class="step" id="step7">
+    <div class="step-header">
+      <div class="step-num">STEP 07</div>
+      <div class="step-title-block">
+        <div class="step-title">Set Delivery</div>
+        <div class="step-subtitle">Delivery only. No meetups. Custom 3–5 days. Free.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Under <strong>Deal methods</strong>, toggle <strong>Meet-up OFF</strong> and <strong>Delivery ON</strong>.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Tap <strong>Edit delivery methods</strong>.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body">
+          <p>Toggle <strong>Carousell Official Delivery OFF</strong>.</p>
+          <p class="note">Leave it off — we do not use Carousell's courier service.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body">
+          <p>Under <strong>Arrange your own delivery</strong>, toggle <strong>Custom (3–5 days) ON</strong>.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">5</div>
+        <div class="step-row-body">
+          <p>Set the delivery fee to <strong>Free</strong>.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">6</div>
+        <div class="step-row-body"><p>Tap <strong>Done</strong>.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image7.png" alt="Carousell delivery settings" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image7.png</div>
+        <div class="img-placeholder-desc">Screenshot of Edit delivery methods screen showing Custom 3–5 days ON and Carousell Official Delivery OFF</div>
+      </div>
+    </div>
+
+    <div class="do-dont">
+      <div class="do-list">
+        <div class="do-list-title">Correct delivery settings</div>
+        <ul>
+          <li>Meet-up — OFF</li>
+          <li>Delivery — ON</li>
+          <li>Carousell Official Delivery — OFF</li>
+          <li>Custom (3–5 days) — ON</li>
+          <li>Delivery fee — Free</li>
+        </ul>
+      </div>
+      <div class="dont-list">
+        <div class="dont-list-title">Do not do these</div>
+        <ul>
+          <li>Enable Meet-up</li>
+          <li>Enable Carousell Official Delivery</li>
+          <li>Set any delivery fee</li>
+          <li>Leave delivery toggled OFF</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 8 ══ -->
+  <div class="step" id="step8">
+    <div class="step-header">
+      <div class="step-num">STEP 08</div>
+      <div class="step-title-block">
+        <div class="step-title">Enable the Buy Button</div>
+        <div class="step-subtitle">Always enable this. It adds Buyer Protection to your listing.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>The Buy Button is Carousell's built-in payment feature. Always enable it. Here is why it matters:</p>
+    </div>
+
+    <div class="field-list">
+      <div class="field-row">
+        <div class="field-name">More sales</div>
+        <div class="field-instruction">Some buyers will only pay through Carousell's platform — they won't pay outside it. Enabling this captures those buyers.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-name">Buyer Protection</div>
+        <div class="field-instruction">When enabled, your listing shows a <strong>Buyer Protection</strong> banner. This builds trust and makes buyers more likely to purchase.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Find the <strong>List with 'Buy' button</strong> section.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Select <strong>Enable 'Buy' button</strong>. Never select Disable.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image8.png" alt="Carousell Buy Button toggle" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image8.png</div>
+        <div class="img-placeholder-desc">Screenshot showing the Buy Button option with Enable selected</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 9 ══ -->
+  <div class="step" id="step9">
+    <div class="step-header">
+      <div class="step-num">STEP 09</div>
+      <div class="step-title-block">
+        <div class="step-title">Set the Price</div>
+        <div class="step-subtitle">Use the sell price from your queue. Do not change it.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body">
+          <p>In the <strong>Price</strong> field, enter the <strong>Sell Price</strong> shown in your queue for this task.</p>
+          <p class="note">The sell price is pre-calculated. Do not round it, do not adjust it.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body">
+          <p>Make sure <strong>Fixed Price</strong> is toggled ON so buyers cannot make offers below the listed price.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body">
+          <p>If you see an <strong>Add WhatsApp button</strong> option and it is available for this listing — enable it.</p>
+          <p class="note">This only appears for eligible categories. If it does not appear, skip this step.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image9.png" alt="Carousell price field" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image9.png</div>
+        <div class="img-placeholder-desc">Screenshot of the price input field with Fixed Price toggled on</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 10 ══ -->
+  <div class="step" id="step10">
+    <div class="step-header">
+      <div class="step-num">STEP 10</div>
+      <div class="step-title-block">
+        <div class="step-title">Post the Listing</div>
+        <div class="step-subtitle">List it, then copy the Carousell URL immediately.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Tap or click <strong>List Now</strong> to post the listing.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Wait for the listing to go live. Carousell will show you the posted listing.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body">
+          <p>Copy the full URL of the live listing from your browser's address bar.</p>
+          <p class="note">It must start with <code>https://www.carousell.sg/p/</code> — copy the whole thing.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image10.png" alt="Live Carousell listing with URL in address bar" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image10.png</div>
+        <div class="img-placeholder-desc">Screenshot of a live Carousell listing page with the URL visible in the address bar</div>
+      </div>
+    </div>
+
+    <div class="notice danger">
+      <div class="notice-icon">✗</div>
+      <div class="notice-body">
+        <strong>Copy the URL before moving on</strong>
+        You need this URL to mark the task as done. If you forget to copy it, go to your Carousell profile, find the listing, and copy it from there.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 11 ══ -->
+  <div class="step" id="step11">
+    <div class="step-header">
+      <div class="step-num">STEP 11</div>
+      <div class="step-title-block">
+        <div class="step-title">Mark as Done in Your Queue</div>
+        <div class="step-subtitle">Submit the Carousell URL to close out the task.</div>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Go back to your queue page and find the task you just posted.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body"><p>Click the task to expand it. Select the <strong>Mark Done</strong> tab.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body">
+          <p>Paste the Carousell URL into the <strong>Carousell Listing URL</strong> field.</p>
+          <p class="note">Must start with <code>https://www.carousell.sg/p/</code> — the queue will reject it if not.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body"><p>Click <strong>Submit Listing</strong>. The task will move to Done and disappear from your active queue.</p></div>
+      </div>
+    </div>
+
+    <div class="img-wrap">
+      <div class="img-placeholder">
+        <img src="images/lister-image11.png" alt="Queue page Mark Done form" onerror="this.style.display='none'">
+        <div class="img-placeholder-icon">📷</div>
+        <div class="img-placeholder-filename">images/lister-image11.png</div>
+        <div class="img-placeholder-desc">Screenshot of the queue page showing the Mark Done tab with the URL field and Submit button</div>
+      </div>
+    </div>
+
+    <div class="notice success">
+      <div class="notice-icon">✓</div>
+      <div class="notice-body">
+        <strong>Task complete</strong>
+        Once submitted, move straight to the next task in your queue. Repeat Steps 2–11 for every listing.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ FLAGGING ══ -->
+  <div class="flag-section" id="flagging">
+    <div class="step-header">
+      <div class="step-num flag-num">⚑ FLAG</div>
+      <div class="step-title-block">
+        <div class="step-title">Flagging a Bad Submission</div>
+        <div class="step-subtitle">Flag, fix it yourself, then post. Never skip a task.</div>
+      </div>
+    </div>
+
+    <div class="instruction">
+      <p>If you open a task and spot a problem with the researcher's submission, you must flag it. Flagging logs the issue against the researcher's record and notifies the manager. After flagging you still fix and post the listing yourself.</p>
+    </div>
+
+    <div class="section-divider">// When to flag</div>
+
+    <div class="flag-reasons">
+      <div class="flag-reason">
+        <div class="flag-reason-icon">⚑</div>
+        <div class="flag-reason-body">
+          <div class="flag-reason-title">Fewer than 5 images in the Drive folder</div>
+          <div class="flag-reason-note">Flag before doing anything else. You will not have enough images to post a proper listing.</div>
+        </div>
+      </div>
+      <div class="flag-reason">
+        <div class="flag-reason-icon">⚑</div>
+        <div class="flag-reason-body">
+          <div class="flag-reason-title">Cover image has a watermark, brand logo, or promotional banner</div>
+          <div class="flag-reason-note">The cover image should be a clean product shot. Branding or watermarks on the cover will hurt the listing.</div>
+        </div>
+      </div>
+      <div class="flag-reason">
+        <div class="flag-reason-icon">⚑</div>
+        <div class="flag-reason-body">
+          <div class="flag-reason-title">Description mentions Shopee, Lazada, Amazon, or any other platform</div>
+          <div class="flag-reason-note">Remove the mention before posting. Flag so the researcher is corrected.</div>
+        </div>
+      </div>
+      <div class="flag-reason">
+        <div class="flag-reason-icon">⚑</div>
+        <div class="flag-reason-body">
+          <div class="flag-reason-title">Description or title contains a brand name</div>
+          <div class="flag-reason-note">Replace the brand name with a generic product name (e.g. "Ikea storage box" → "stackable storage box"). Flag so it is logged.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider">// How to flag</div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-row-num">1</div>
+        <div class="step-row-body"><p>Open the task in your queue and click the <strong>Flag Issue</strong> tab.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">2</div>
+        <div class="step-row-body">
+          <p>Write a clear description of the problem in the reason field.</p>
+          <div class="example" style="margin-top:8px;">
+            <strong>Good flag reasons</strong>
+            "Only 3 images in Drive folder"<br>
+            "Cover image has a large Shopee watermark"<br>
+            "Description mentions Shopee twice — removed before posting"<br>
+            "Title contains brand name 'Philips' — replaced with 'electric shaver'"
+          </div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">3</div>
+        <div class="step-row-body"><p>Click <strong>Submit Flag</strong>. The queue will switch back to the Mark Done tab automatically.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-row-num">4</div>
+        <div class="step-row-body">
+          <p><strong>Fix the problem yourself</strong>, then post the listing and mark it done as normal.</p>
+          <p class="note">Remove brand names. Remove competitor platform mentions. If the cover image has branding, use the next best image as the cover instead.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice warn">
+      <div class="notice-icon">⚠</div>
+      <div class="notice-body">
+        <strong>Never skip a flagged task</strong>
+        Flagging is a note to management — it does not remove the task from your queue. You are responsible for fixing and posting every task assigned to you, even flagged ones.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ CHECKLIST ══ -->
+  <div class="checklist-section" id="checklist">
+
+    <div class="checklist-header">
+      <div class="checklist-title">// Per-Listing Checklist</div>
+      <div class="checklist-subtitle">Run through this for every listing before you mark it done. Click each item to tick it off.</div>
+    </div>
+
+    <div class="checklist-progress">
+      <div class="checklist-count">
+        <span id="cl-done">0</span> / <span id="cl-total">0</span>
+        <span>items checked</span>
+      </div>
+      <div class="bar-outer">
+        <div class="bar-inner" id="cl-bar" style="width:0%"></div>
+      </div>
+      <div class="checklist-pct" id="cl-pct">0%</div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Before posting</div>
+
+      <div class="check-item" data-id="c1">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Drive folder has at least 5 images</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c2">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Cover image is clean — no watermarks, no brand logos, no banners</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c3">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">All images downloaded</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// On Carousell</div>
+
+      <div class="check-item" data-id="c4">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Images uploaded in correct order — cover first, then details, dimensions, variants</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c5">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Category selected — most specific subcategory chosen</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c6">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Condition set to Brand New</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c7">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Title copied from queue — no brand names, no edits</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c8">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Brand set to Others / Unbranded</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c9">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Description copied from queue — no brand names, no platform mentions</div>
+          <div class="check-note">If you had to fix it, you also flagged the task</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c10">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">"I have more than one of the same item" ticked</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// Delivery &amp; payment</div>
+
+      <div class="check-item" data-id="c11">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Meet-up OFF, Delivery ON</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c12">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Carousell Official Delivery OFF, Custom (3–5 days) ON, fee set to Free</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c13">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Buy Button enabled</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c14">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Price matches sell price in queue exactly</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">// After posting</div>
+
+      <div class="check-item" data-id="c15">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">Carousell URL copied — starts with https://www.carousell.sg/p/</div>
+        </div>
+      </div>
+      <div class="check-item" data-id="c16">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div>
+          <div class="check-label">URL submitted in queue — task marked as Done</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ready-badge" id="ready-badge">
+      ✓ &nbsp; ALL CHECKS COMPLETE — READY FOR NEXT LISTING
+    </div>
+
+    <button class="reset-btn" onclick="resetChecklist()">// RESET CHECKLIST</button>
+
+  </div>
+
+</div>
+
+<script>
+  const CL_KEY = 'carousell_lister_sop_v1';
+
+  function getState() {
+    try { return JSON.parse(localStorage.getItem(CL_KEY)) || {}; } catch { return {}; }
+  }
+
+  function saveState(s) { localStorage.setItem(CL_KEY, JSON.stringify(s)); }
+
+  function updateChecklist() {
+    const all   = document.querySelectorAll('.check-item[data-id]');
+    const done  = document.querySelectorAll('.check-item[data-id].done');
+    const total = all.length;
+    const count = done.length;
+    const pct   = total ? Math.round(count / total * 100) : 0;
+
+    document.getElementById('cl-done').textContent  = count;
+    document.getElementById('cl-total').textContent = total;
+    document.getElementById('cl-bar').style.width   = pct + '%';
+    document.getElementById('cl-pct').textContent   = pct + '%';
+    document.getElementById('ready-badge').style.display = (count === total && total > 0) ? 'block' : 'none';
+  }
+
+  function initChecklist() {
+    const state = getState();
+    document.querySelectorAll('.check-item[data-id]').forEach(item => {
+      if (state[item.dataset.id]) item.classList.add('done');
+      item.addEventListener('click', () => {
+        const s = getState();
+        if (item.classList.contains('done')) {
+          item.classList.remove('done');
+          delete s[item.dataset.id];
+        } else {
+          item.classList.add('done');
+          s[item.dataset.id] = true;
+        }
+        saveState(s);
+        updateChecklist();
+      });
+    });
+    updateChecklist();
+  }
+
+  function resetChecklist() {
+    if (!confirm('Reset checklist for this listing?')) return;
+    localStorage.removeItem(CL_KEY);
+    document.querySelectorAll('.check-item.done').forEach(t => t.classList.remove('done'));
+    updateChecklist();
+  }
+
+  initChecklist();
+
+  // Auto-hide broken images and show placeholders
+  document.querySelectorAll('.img-placeholder img').forEach(img => {
+    img.addEventListener('error', () => { img.style.display = 'none'; });
+    if (img.complete && img.naturalWidth === 0) img.style.display = 'none';
+  });
+</script>
+</body>
+</html>

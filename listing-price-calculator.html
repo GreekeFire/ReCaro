@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listing Price Calculator — Carousell Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --text: #e8e8e8;
+    --muted: #666;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Header ─────────────────────────────────────── */
+  header { margin-bottom: 48px; }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  /* ── Input card ──────────────────────────────────── */
+  .input-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 28px 24px;
+    margin-bottom: 16px;
+  }
+
+  .input-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    transition: border-color 0.15s;
+  }
+
+  .input-row:focus-within {
+    border-color: var(--accent);
+  }
+
+  .input-prefix {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    padding: 14px 0 14px 18px;
+    user-select: none;
+    line-height: 1;
+  }
+
+  #cost-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    padding: 14px 18px 14px 10px;
+    width: 100%;
+    -moz-appearance: textfield;
+  }
+
+  #cost-input::-webkit-outer-spin-button,
+  #cost-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  #cost-input::placeholder { color: #333; }
+
+  /* ── Result card ──────────────────────────────────── */
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 28px 24px;
+    margin-bottom: 16px;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .result-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 8px;
+    opacity: 0.3;
+  }
+
+  .result-placeholder-icon {
+    font-family: var(--mono);
+    font-size: 28px;
+    color: var(--muted);
+  }
+
+  .result-placeholder-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .result-main { display: none; }
+
+  .result-main.visible { display: flex; flex-direction: column; gap: 16px; }
+
+  .sell-price-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .sell-price-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .sell-price-value {
+    font-family: var(--mono);
+    font-size: clamp(36px, 7vw, 56px);
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: color 0.2s;
+  }
+
+  .rule-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 5px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .rule-badge.rule-15x {
+    background: rgba(249,115,22,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(249,115,22,0.2);
+  }
+
+  .rule-badge.rule-plus20 {
+    background: rgba(234,179,8,0.1);
+    color: var(--yellow);
+    border: 1px solid rgba(234,179,8,0.2);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+  .profit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .profit-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .profit-value {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: -0.01em;
+  }
+
+  .rule-explanation {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .rule-explanation strong {
+    color: #aaa;
+    font-weight: 500;
+  }
+
+  /* ── Formula card ──────────────────────────────────── */
+  .formula-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .formula-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .formula-text {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent2);
+    background: rgba(249,115,22,0.06);
+    border: 1px solid rgba(249,115,22,0.15);
+    padding: 6px 12px;
+    border-radius: 3px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Examples table ──────────────────────────────────── */
+  .examples-section { margin-bottom: 16px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  thead tr {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 400;
+  }
+
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(42,42,42,0.6);
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tbody tr:hover td { background: var(--surface2); }
+
+  tbody tr.active-row td { background: rgba(249,115,22,0.05); }
+  tbody tr.active-row td:first-child { color: var(--accent); }
+
+  td.sell { color: var(--accent); font-weight: 700; }
+
+  td.rule-15x-cell {
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  td.rule-plus20-cell {
+    color: var(--yellow);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  td.profit-cell { color: var(--green); }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <header>
+    <div class="header-tag">// CAROUSELL OPS — PRICE CALCULATOR</div>
+    <h1>Enter your cost,<br><span>get your price.</span></h1>
+    <p class="subtitle">Instant sell price using the standard markup formula. No internet needed.</p>
+  </header>
+
+  <!-- Input -->
+  <div class="input-card">
+    <label class="input-label" for="cost-input">Source cost (SGD)</label>
+    <div class="input-row">
+      <span class="input-prefix">$</span>
+      <input
+        id="cost-input"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="0.00"
+        oninput="calculate()"
+        autocomplete="off"
+      >
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-card" id="result-card">
+    <div class="result-placeholder" id="placeholder">
+      <div class="result-placeholder-icon">→</div>
+      <div class="result-placeholder-text">Enter a cost above</div>
+    </div>
+
+    <div class="result-main" id="result-main">
+      <div class="sell-price-row">
+        <div>
+          <div class="sell-price-label">Sell price</div>
+          <div class="sell-price-value" id="sell-price">$—</div>
+        </div>
+        <span class="rule-badge" id="rule-badge"></span>
+      </div>
+      <div class="divider"></div>
+      <div class="profit-row">
+        <span class="profit-label">Profit</span>
+        <span class="profit-value" id="profit-value"></span>
+      </div>
+      <div class="rule-explanation" id="rule-explanation"></div>
+    </div>
+  </div>
+
+  <!-- Formula -->
+  <div class="formula-card">
+    <span class="formula-tag">Formula</span>
+    <span class="formula-text">CEILING( MAX(cost × 1.5, cost + $20), $5 )</span>
+  </div>
+
+  <!-- Examples table -->
+  <div class="examples-section">
+    <div class="section-header">
+      <span class="section-title">Reference examples</span>
+      <div class="section-line"></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Source cost</th>
+          <th>Sell price</th>
+          <th>Profit</th>
+          <th>Rule applied</th>
+        </tr>
+      </thead>
+      <tbody id="examples-tbody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  const EXAMPLES = [5, 10, 15, 20, 30, 40, 50, 80, 100, 150];
+
+  function calcSellPrice(cost) {
+    return Math.ceil(Math.max(cost * 1.5, cost + 20) / 5) * 5;
+  }
+
+  function getRule(cost) {
+    return cost * 1.5 >= cost + 20 ? '1.5x' : 'plus20';
+  }
+
+  function fmt(n) {
+    return '$' + n.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)$/, '$10');
+  }
+
+  function fmtInt(n) {
+    return '$' + n.toFixed(0);
+  }
+
+  function calculate() {
+    const raw = document.getElementById('cost-input').value;
+    const cost = parseFloat(raw);
+    const placeholder = document.getElementById('placeholder');
+    const resultMain = document.getElementById('result-main');
+
+    if (!raw || isNaN(cost) || cost <= 0) {
+      placeholder.style.display = 'flex';
+      resultMain.classList.remove('visible');
+      highlightActiveRow(null);
+      return;
+    }
+
+    placeholder.style.display = 'none';
+    resultMain.classList.add('visible');
+
+    const sell = calcSellPrice(cost);
+    const profit = sell - cost;
+    const pct = Math.round((profit / cost) * 100);
+    const rule = getRule(cost);
+
+    document.getElementById('sell-price').textContent = fmtInt(sell);
+
+    const badge = document.getElementById('rule-badge');
+    const expl = document.getElementById('rule-explanation');
+
+    if (rule === '1.5x') {
+      badge.textContent = '1.5× MARKUP';
+      badge.className = 'rule-badge rule-15x';
+      expl.innerHTML = `<strong>Why:</strong> cost × 1.5 (${fmt(cost * 1.5)}) beats cost + $20 (${fmt(cost + 20)}) — so the 1.5× rule wins.`;
+    } else {
+      badge.textContent = '+$20 MARKUP';
+      badge.className = 'rule-badge rule-plus20';
+      expl.innerHTML = `<strong>Why:</strong> cost + $20 (${fmt(cost + 20)}) beats cost × 1.5 (${fmt(cost * 1.5)}) — so the +$20 rule wins.`;
+    }
+
+    document.getElementById('profit-value').textContent =
+      `${fmtInt(profit)} (${pct}% margin)`;
+
+    highlightActiveRow(cost);
+  }
+
+  function highlightActiveRow(cost) {
+    document.querySelectorAll('#examples-tbody tr').forEach(tr => {
+      tr.classList.remove('active-row');
+    });
+    if (cost === null) return;
+
+    // Highlight the closest row whose source cost is nearest to input
+    const rows = document.querySelectorAll('#examples-tbody tr');
+    let closest = null, minDiff = Infinity;
+    rows.forEach(tr => {
+      const rowCost = parseFloat(tr.dataset.cost);
+      const diff = Math.abs(rowCost - cost);
+      if (diff < minDiff) { minDiff = diff; closest = tr; }
+    });
+    if (closest && minDiff <= 10) closest.classList.add('active-row');
+  }
+
+  function buildExamples() {
+    const tbody = document.getElementById('examples-tbody');
+    tbody.innerHTML = '';
+    EXAMPLES.forEach(cost => {
+      const sell = calcSellPrice(cost);
+      const profit = sell - cost;
+      const pct = Math.round((profit / cost) * 100);
+      const rule = getRule(cost);
+      const tr = document.createElement('tr');
+      tr.dataset.cost = cost;
+      tr.innerHTML = `
+        <td>${fmtInt(cost)}</td>
+        <td class="sell">${fmtInt(sell)}</td>
+        <td class="profit-cell">${fmtInt(profit)} <span style="color:var(--muted);font-size:11px">(${pct}%)</span></td>
+        <td class="${rule === '1.5x' ? 'rule-15x-cell' : 'rule-plus20-cell'}">${rule === '1.5x' ? '1.5× MARKUP' : '+$20 MARKUP'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  buildExamples();
+</script>
+</body>
+</html>

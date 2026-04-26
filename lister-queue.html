@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lister Queue — %%LISTER_CODE%%</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --surface3: #252525;
+    --border: #2a2a2a;
+    --border2: #333;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.08);
+    --green-border: rgba(34,197,94,0.2);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.08);
+    --red-border: rgba(239,68,68,0.2);
+    --yellow: #eab308;
+    --blue: #60a5fa;
+    --text: #e8e8e8;
+    --muted: #666;
+    --muted2: #888;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── Noise overlay ── */
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .topbar-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .lister-badge {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.25);
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .queue-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .queue-count {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .refresh-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted2);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.15s;
+  }
+
+  .refresh-btn:hover { border-color: #444; color: var(--text); }
+  .refresh-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ── Main layout ── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Error / empty states ── */
+  .state-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 48px 32px;
+    text-align: center;
+  }
+
+  .state-box.error {
+    border-color: var(--red-border);
+    background: var(--red-dim);
+  }
+
+  .state-icon {
+    font-family: var(--mono);
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .state-title {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .state-sub {
+    font-size: 13px;
+    color: var(--muted2);
+    line-height: 1.5;
+  }
+
+  /* ── Loading spinner ── */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Toast notification ── */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 999;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 12px 18px;
+    border-radius: 4px;
+    border: 1px solid;
+    max-width: 340px;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { background: rgba(34,197,94,0.12); border-color: var(--green-border); color: var(--green); }
+  #toast.error   { background: var(--red-dim); border-color: var(--red-border); color: var(--red); }
+  #toast.info    { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.25); color: var(--blue); }
+
+  /* ── Task card ── */
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .task-card:hover { border-color: var(--border2); }
+
+  .task-card.expanded { border-color: rgba(249,115,22,0.3); }
+
+  .task-card.status-done {
+    border-color: var(--green-border);
+    background: var(--green-dim);
+    opacity: 0.7;
+  }
+
+  .task-card.status-flagged {
+    border-color: var(--red-border);
+    background: var(--red-dim);
+    opacity: 0.7;
+  }
+
+  /* ── Task header (always visible) ── */
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .task-status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--accent);
+  }
+
+  .task-card.status-in-progress .task-status-dot { background: var(--yellow); }
+  .task-card.status-done        .task-status-dot { background: var(--green); }
+  .task-card.status-flagged     .task-status-dot { background: var(--red); }
+
+  .task-title-wrap { flex: 1; min-width: 0; }
+
+  .task-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .task-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 3px;
+    flex-wrap: wrap;
+  }
+
+  .task-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .task-meta.price {
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  .task-meta.va {
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.15);
+    padding: 1px 6px;
+    border-radius: 2px;
+    color: var(--accent);
+  }
+
+  .task-meta.status-badge {
+    padding: 1px 7px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .task-meta.status-pending    { background: rgba(249,115,22,0.08); color: var(--accent); border: 1px solid rgba(249,115,22,0.2); }
+  .task-meta.status-inprogress { background: rgba(234,179,8,0.08);  color: var(--yellow); border: 1px solid rgba(234,179,8,0.2); }
+  .task-meta.status-done       { background: var(--green-dim);       color: var(--green);  border: 1px solid var(--green-border); }
+  .task-meta.status-flagged    { background: var(--red-dim);         color: var(--red);    border: 1px solid var(--red-border); }
+
+  .expand-icon {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    width: 20px;
+    text-align: center;
+  }
+
+  .task-card.expanded .expand-icon { transform: rotate(180deg); }
+
+  /* ── Task body (expanded) ── */
+  .task-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .task-card.expanded .task-body { display: block; }
+
+  /* Details grid */
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 560px) {
+    .details-grid { grid-template-columns: 1fr; }
+  }
+
+  .detail-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+  }
+
+  .detail-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .detail-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .detail-value.big {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .detail-value.green {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .detail-link {
+    color: var(--blue);
+    text-decoration: none;
+    font-size: 13px;
+    word-break: break-all;
+    display: inline-block;
+    margin-top: 2px;
+  }
+
+  .detail-link:hover { text-decoration: underline; }
+
+  /* Description block */
+  .desc-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+  }
+
+  .desc-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted2);
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { border-color: #444; color: var(--text); }
+  .copy-btn.copied { border-color: var(--green-border); color: var(--green); }
+
+  .desc-text {
+    font-size: 13px;
+    color: var(--muted2);
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 160px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  .desc-text.expanded-text { max-height: none; }
+
+  .expand-desc-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 0 0;
+    letter-spacing: 0.06em;
+    display: block;
+  }
+
+  /* Title copy block */
+  .title-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+
+  .title-text {
+    font-size: 13px;
+    color: var(--muted2);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  /* ── Action panel ── */
+  .action-panel {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    margin-top: 4px;
+  }
+
+  .action-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .action-tab {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 7px 16px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    background: none;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    color: var(--muted2);
+    transition: all 0.15s;
+  }
+
+  .action-tab:hover { border-color: #444; color: var(--text); }
+
+  .action-tab.active-done {
+    background: var(--green-dim);
+    border-color: var(--green-border);
+    color: var(--green);
+  }
+
+  .action-tab.active-flag {
+    background: var(--red-dim);
+    border-color: var(--red-border);
+    color: var(--red);
+  }
+
+  .action-form { display: none; }
+  .action-form.visible { display: block; }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .form-input, .form-textarea {
+    width: 100%;
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus, .form-textarea:focus {
+    border-color: rgba(249,115,22,0.5);
+    background: var(--surface2);
+  }
+
+  .form-input.invalid { border-color: var(--red-border) !important; }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  .form-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .form-hint.error-hint {
+    color: var(--red);
+  }
+
+  .submit-btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 700;
+  }
+
+  .submit-btn:disabled { opacity: 0.45; cursor: default; }
+
+  .submit-btn.done-btn {
+    background: var(--green);
+    color: #000;
+  }
+
+  .submit-btn.done-btn:hover:not(:disabled) {
+    background: #16a34a;
+  }
+
+  .submit-btn.flag-btn {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .submit-btn.flag-btn:hover:not(:disabled) {
+    background: #dc2626;
+  }
+
+  /* ── Inline result state on task ── */
+  .result-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .result-banner.success {
+    background: var(--green-dim);
+    border: 1px solid var(--green-border);
+    color: var(--green);
+  }
+
+  .result-banner.fail {
+    background: var(--red-dim);
+    border: 1px solid var(--red-border);
+    color: var(--red);
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── No param error ── */
+  #no-param-error {
+    display: none;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-tag">// CAROUSELL OPS</div>
+    <div id="lister-badge" class="lister-badge">—</div>
+    <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">LISTER QUEUE</span>
+  </div>
+  <div class="queue-meta">
+    <span>Pending: <span class="queue-count" id="pending-count">—</span></span>
+    <button class="refresh-btn" id="refresh-btn" onclick="loadQueue()">↻ REFRESH</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="container">
+
+  <!-- Loading -->
+  <div id="loading-state" class="loading" style="display:none;">
+    <div class="spinner"></div>
+    LOADING QUEUE...
+  </div>
+
+  <!-- Fetch error -->
+  <div id="fetch-error" class="state-box error" style="display:none;">
+    <span class="state-icon">✕</span>
+    <div class="state-title" id="fetch-error-title">Failed to load queue</div>
+    <div class="state-sub" id="fetch-error-body">Check your connection and try refreshing.</div>
+  </div>
+
+  <!-- Empty queue -->
+  <div id="empty-state" class="state-box" style="display:none;">
+    <span class="state-icon" style="color:var(--green)">✓</span>
+    <div class="state-title">Queue is clear</div>
+    <div class="state-sub">No pending tasks assigned to you right now.<br>Check back later or refresh.</div>
+  </div>
+
+  <!-- Task list -->
+  <div id="task-list-wrap" style="display:none;">
+    <div class="section-label" id="queue-section-label">PENDING TASKS</div>
+    <div class="task-list" id="task-list"></div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPVjsFvW5LXsPM38jsZjj5mGJb3CJN4pQ3r37zk_Zbh_g1vCnklgAj7B92zTlCRcgH/exec";
+
+  // ── State ────────────────────────────────────────────────────
+  const LISTER_CODE = "%%LISTER_CODE%%";
+  let tasks = [];
+
+  // ── Init ─────────────────────────────────────────────────────
+  (function init() {
+    document.getElementById("lister-badge").textContent = LISTER_CODE;
+    document.title = `Queue — ${LISTER_CODE}`;
+    loadQueue();
+  })();
+
+  // ── Load queue ───────────────────────────────────────────────
+  function loadQueue() {
+    const btn = document.getElementById("refresh-btn");
+    btn.disabled = true;
+
+    show("loading-state");
+    hide("fetch-error");
+    hide("empty-state");
+    hide("task-list-wrap");
+    document.getElementById("pending-count").textContent = "—";
+
+    const url = `${SCRIPT_URL}?action=queue&lister=${encodeURIComponent(LISTER_CODE)}`;
+
+    fetch(url)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        hide("loading-state");
+        btn.disabled = false;
+
+        if (!data.ok) {
+          showFetchError("Server returned an error", data.error || "Unknown error");
+          return;
+        }
+
+        tasks = data.tasks || [];
+        const pending = tasks.filter(t => norm(t.status) === "pending" || norm(t.status) === "in progress");
+        document.getElementById("pending-count").textContent = pending.length;
+
+        if (tasks.length === 0) {
+          show("empty-state");
+          return;
+        }
+
+        renderTasks(tasks);
+        show("task-list-wrap");
+      })
+      .catch(err => {
+        hide("loading-state");
+        btn.disabled = false;
+        showFetchError("Could not reach server", err.message);
+      });
+  }
+
+  // ── Render tasks ─────────────────────────────────────────────
+  function renderTasks(taskList) {
+    const container = document.getElementById("task-list");
+    container.innerHTML = "";
+
+    // Sort: pending first, then in progress, then done/flagged
+    const order = { "pending": 0, "in progress": 1, "done": 2, "flagged": 3 };
+    const sorted = [...taskList].sort((a, b) =>
+      (order[norm(a.status)] ?? 9) - (order[norm(b.status)] ?? 9)
+    );
+
+    sorted.forEach(task => {
+      container.appendChild(buildTaskCard(task));
+    });
+
+    const label = document.getElementById("queue-section-label");
+    label.textContent = `${taskList.length} TASK${taskList.length !== 1 ? "S" : ""} IN QUEUE`;
+  }
+
+  function buildTaskCard(task) {
+    const statusKey = norm(task.status).replace(" ", "-");
+    const isDone    = statusKey === "done";
+    const isFlagged = statusKey === "flagged";
+    const isLocked  = isDone || isFlagged;
+
+    const margin = task.sourceCost > 0
+      ? Math.round(((task.sellPrice - task.sourceCost) / task.sellPrice) * 100)
+      : 0;
+
+    const card = el("div", `task-card status-${statusKey}`);
+    card.dataset.rowIndex = task.rowIndex;
+
+    // ── Header ──
+    const header = el("div", "task-header");
+    header.innerHTML = `
+      <div class="task-status-dot"></div>
+      <div class="task-title-wrap">
+        <div class="task-title">${esc(task.title)}</div>
+        <div class="task-meta-row">
+          <span class="task-meta va">${esc(task.vaCode)}</span>
+          <span class="task-meta price">S$${fmt(task.sellPrice)}</span>
+          <span class="task-meta">cost S$${fmt(task.sourceCost)}</span>
+          <span class="task-meta">${margin}% margin</span>
+          <span class="task-meta status-badge status-${statusKey.replace(" ","")}">
+            ${esc(task.status)}
+          </span>
+          ${task.timestamp ? `<span class="task-meta">${esc(task.timestamp)}</span>` : ""}
+        </div>
+      </div>
+      <div class="expand-icon">▾</div>
+    `;
+    header.addEventListener("click", () => toggleCard(card));
+    card.appendChild(header);
+
+    // ── Body ──
+    const body = el("div", "task-body");
+
+    // Price details
+    body.innerHTML += `
+      <div class="details-grid">
+        <div class="detail-item">
+          <div class="detail-label">Sell Price</div>
+          <div class="detail-value big">S$${fmt(task.sellPrice)}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Source Cost</div>
+          <div class="detail-value big" style="color:var(--muted2)">S$${fmt(task.sourceCost)}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Margin</div>
+          <div class="detail-value green">${margin}% (S$${fmt(task.sellPrice - task.sourceCost)})</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Researcher VA</div>
+          <div class="detail-value">${esc(task.vaCode)}</div>
+        </div>
+        <div class="detail-item" style="grid-column:1/-1">
+          <div class="detail-label">Shopee Source Link</div>
+          <a class="detail-link" href="${esc(task.shopeeLink)}" target="_blank" rel="noopener">
+            ${esc(task.shopeeLink)}
+          </a>
+        </div>
+        <div class="detail-item" style="grid-column:1/-1">
+          <div class="detail-label">Drive Folder (images)</div>
+          <a class="detail-link" href="${esc(task.driveFolder)}" target="_blank" rel="noopener">
+            ${esc(task.driveFolder)}
+          </a>
+        </div>
+      </div>
+    `;
+
+    // Title block
+    const titleBlock = el("div", "title-block");
+    const titleLabel = el("div", "desc-label");
+    titleLabel.innerHTML = `PRODUCT TITLE <button class="copy-btn" data-copy="${esc(task.title)}" onclick="copyField(this)">COPY</button>`;
+    const titleText = el("div", "title-text");
+    titleText.textContent = task.title;
+    titleBlock.appendChild(titleLabel);
+    titleBlock.appendChild(titleText);
+    body.appendChild(titleBlock);
+
+    // Description block
+    const descBlock = el("div", "desc-block");
+    const descId = `desc-${task.rowIndex}`;
+    const descLabel = el("div", "desc-label");
+    descLabel.innerHTML = `PRODUCT DESCRIPTION <button class="copy-btn" onclick="copyDesc(${task.rowIndex})">COPY</button>`;
+    const descText = el("pre", "desc-text");
+    descText.id = descId;
+    descText.textContent = task.description;
+
+    const expandDescBtn = el("button", "expand-desc-btn");
+    expandDescBtn.textContent = "▾ SHOW FULL DESCRIPTION";
+    expandDescBtn.onclick = function() {
+      const pre = document.getElementById(descId);
+      if (pre.classList.contains("expanded-text")) {
+        pre.classList.remove("expanded-text");
+        this.textContent = "▾ SHOW FULL DESCRIPTION";
+      } else {
+        pre.classList.add("expanded-text");
+        this.textContent = "▴ COLLAPSE";
+      }
+    };
+
+    descBlock.appendChild(descLabel);
+    descBlock.appendChild(descText);
+    descBlock.appendChild(expandDescBtn);
+    body.appendChild(descBlock);
+
+    // ── Action panel (only for unlocked tasks) ──
+    if (!isLocked) {
+      const panel = el("div", "action-panel");
+      const resultId = `result-${task.rowIndex}`;
+
+      panel.innerHTML = `
+        <div class="action-tabs">
+          <button class="action-tab active-done" id="tab-done-${task.rowIndex}" onclick="switchTab(${task.rowIndex},'done')">
+            ✓ MARK DONE
+          </button>
+          <button class="action-tab" id="tab-flag-${task.rowIndex}" onclick="switchTab(${task.rowIndex},'flag')">
+            ⚑ FLAG ISSUE
+          </button>
+        </div>
+
+        <!-- Done form -->
+        <div class="action-form visible" id="form-done-${task.rowIndex}">
+          <div class="form-group">
+            <label class="form-label" for="url-${task.rowIndex}">Carousell Listing URL</label>
+            <input
+              class="form-input"
+              id="url-${task.rowIndex}"
+              type="url"
+              placeholder="https://www.carousell.sg/p/..."
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <div class="form-hint" id="url-hint-${task.rowIndex}">Must start with https://www.carousell.sg/</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="price-${task.rowIndex}">Listed Price (S$)</label>
+            <input
+              class="form-input"
+              id="price-${task.rowIndex}"
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="${task.sellPrice}"
+              autocomplete="off"
+            >
+            <div class="form-hint">Price you actually listed on Carousell</div>
+          </div>
+          <button
+            class="submit-btn done-btn"
+            id="done-submit-${task.rowIndex}"
+            onclick="submitDone(${task.rowIndex})"
+          >
+            SUBMIT LISTING →
+          </button>
+        </div>
+
+        <!-- Flag form -->
+        <div class="action-form" id="form-flag-${task.rowIndex}">
+          <div class="form-group">
+            <label class="form-label" for="reason-${task.rowIndex}">Reason for flagging</label>
+            <textarea
+              class="form-textarea"
+              id="reason-${task.rowIndex}"
+              placeholder="Describe the issue clearly — e.g. 'Title is keyword spam', 'Description too short / copied from Shopee', 'Product images are low quality', 'Wrong category for this product'..."
+            ></textarea>
+          </div>
+          <button
+            class="submit-btn flag-btn"
+            id="flag-submit-${task.rowIndex}"
+            onclick="submitFlag(${task.rowIndex})"
+          >
+            SUBMIT FLAG
+          </button>
+        </div>
+
+        <div id="${resultId}" style="margin-top:12px;"></div>
+      `;
+
+      body.appendChild(panel);
+    } else {
+      // Show locked status message
+      const note = el("div", "result-banner " + (isDone ? "success" : "fail"));
+      note.textContent = isDone
+        ? "✓ Task completed"
+        : "⚑ Task flagged — awaiting owner review";
+      body.appendChild(note);
+    }
+
+    card.appendChild(body);
+    return card;
+  }
+
+  // ── Tab switcher ─────────────────────────────────────────────
+  function switchTab(rowIndex, tab) {
+    const doneTab  = document.getElementById(`tab-done-${rowIndex}`);
+    const flagTab  = document.getElementById(`tab-flag-${rowIndex}`);
+    const doneForm = document.getElementById(`form-done-${rowIndex}`);
+    const flagForm = document.getElementById(`form-flag-${rowIndex}`);
+
+    if (tab === "done") {
+      doneTab.className  = "action-tab active-done";
+      flagTab.className  = "action-tab";
+      doneForm.className = "action-form visible";
+      flagForm.className = "action-form";
+    } else {
+      flagTab.className  = "action-tab active-flag";
+      doneTab.className  = "action-tab";
+      flagForm.className = "action-form visible";
+      doneForm.className = "action-form";
+    }
+  }
+
+  // ── Submit done ──────────────────────────────────────────────
+  function submitDone(rowIndex) {
+    const urlEl   = document.getElementById(`url-${rowIndex}`);
+    const priceEl = document.getElementById(`price-${rowIndex}`);
+    const hintEl  = document.getElementById(`url-hint-${rowIndex}`);
+    const btn     = document.getElementById(`done-submit-${rowIndex}`);
+
+    const carousellUrl = urlEl.value.trim();
+    const listedPrice  = parseFloat(priceEl.value);
+
+    // Validate URL
+    if (!carousellUrl.startsWith("https://www.carousell.sg/")) {
+      urlEl.classList.add("invalid");
+      hintEl.textContent = "⚠ URL must start with https://www.carousell.sg/";
+      hintEl.classList.add("error-hint");
+      urlEl.focus();
+      return;
+    }
+    urlEl.classList.remove("invalid");
+    hintEl.textContent  = "Must start with https://www.carousell.sg/";
+    hintEl.classList.remove("error-hint");
+
+    // Validate price
+    if (isNaN(listedPrice) || listedPrice <= 0) {
+      priceEl.classList.add("invalid");
+      priceEl.focus();
+      return;
+    }
+    priceEl.classList.remove("invalid");
+
+    btn.disabled = true;
+    btn.textContent = "SUBMITTING...";
+
+    const url = `${SCRIPT_URL}?action=complete`
+      + `&rowIndex=${encodeURIComponent(rowIndex)}`
+      + `&lister=${encodeURIComponent(LISTER_CODE)}`
+      + `&carousellUrl=${encodeURIComponent(carousellUrl)}`
+      + `&listedPrice=${encodeURIComponent(listedPrice)}`;
+
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        const resultEl = document.getElementById(`result-${rowIndex}`);
+        if (data.ok) {
+          resultEl.innerHTML = `<div class="result-banner success">✓ Listing submitted successfully</div>`;
+          btn.textContent = "SUBMITTED ✓";
+          // Update card status visually
+          const card = document.querySelector(`.task-card[data-row-index="${rowIndex}"]`);
+          if (card) {
+            card.className = "task-card status-done";
+            const dot = card.querySelector(".task-status-dot");
+            if (dot) dot.style.background = "var(--green)";
+            const badge = card.querySelector(".task-meta.status-badge");
+            if (badge) {
+              badge.className = "task-meta status-badge status-done";
+              badge.textContent = "Done";
+            }
+          }
+          // Update pending count
+          updatePendingCount(-1);
+          showToast("Listing marked as done ✓", "success");
+        } else {
+          resultEl.innerHTML = `<div class="result-banner fail">✕ ${esc(data.error || "Submission failed")}</div>`;
+          btn.disabled = false;
+          btn.textContent = "SUBMIT LISTING →";
+        }
+      })
+      .catch(err => {
+        const resultEl = document.getElementById(`result-${rowIndex}`);
+        resultEl.innerHTML = `<div class="result-banner fail">✕ Network error — ${esc(err.message)}</div>`;
+        btn.disabled = false;
+        btn.textContent = "SUBMIT LISTING →";
+      });
+  }
+
+  // ── Submit flag ──────────────────────────────────────────────
+  function submitFlag(rowIndex) {
+    const reasonEl = document.getElementById(`reason-${rowIndex}`);
+    const btn      = document.getElementById(`flag-submit-${rowIndex}`);
+    const reason   = reasonEl.value.trim();
+
+    if (!reason) {
+      reasonEl.classList.add("invalid");
+      reasonEl.focus();
+      return;
+    }
+    reasonEl.classList.remove("invalid");
+
+    if (!confirm(`Flag this submission?\n\nReason: "${reason}"\n\nThis will increment the researcher's rejection count.`)) return;
+
+    btn.disabled = true;
+    btn.textContent = "SUBMITTING...";
+
+    const url = `${SCRIPT_URL}?action=flag`
+      + `&rowIndex=${encodeURIComponent(rowIndex)}`
+      + `&lister=${encodeURIComponent(LISTER_CODE)}`
+      + `&reason=${encodeURIComponent(reason)}`;
+
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        const resultEl = document.getElementById(`result-${rowIndex}`);
+        if (data.ok) {
+          resultEl.innerHTML = `<div class="result-banner fail">⚑ Flagged — Quinn notified. Still post the listing and mark it done below.</div>`;
+          btn.textContent = "FLAGGED ⚑";
+          btn.disabled = true;
+          const card = document.querySelector(`.task-card[data-row-index="${rowIndex}"]`);
+          if (card) {
+            // Update status badge to show flagged, but keep card interactive
+            const badge = card.querySelector(".task-meta.status-badge");
+            if (badge) {
+              badge.className = "task-meta status-badge status-flagged";
+              badge.textContent = "Flagged";
+            }
+          }
+          // Switch back to the Done tab so lister knows to complete it
+          switchTab(rowIndex, "done");
+          showToast("Flagged ⚑  — now post the listing and mark it done", "info");
+        } else {
+          resultEl.innerHTML = `<div class="result-banner fail">✕ ${esc(data.error || "Flag failed")}</div>`;
+          btn.disabled = false;
+          btn.textContent = "SUBMIT FLAG";
+        }
+      })
+      .catch(err => {
+        const resultEl = document.getElementById(`result-${rowIndex}`);
+        resultEl.innerHTML = `<div class="result-banner fail">✕ Network error — ${esc(err.message)}</div>`;
+        btn.disabled = false;
+        btn.textContent = "SUBMIT FLAG";
+      });
+  }
+
+  // ── Card toggle ──────────────────────────────────────────────
+  function toggleCard(card) {
+    const wasOpen = card.classList.contains("expanded");
+    // Close all open cards
+    document.querySelectorAll(".task-card.expanded").forEach(c => c.classList.remove("expanded"));
+    if (!wasOpen) card.classList.add("expanded");
+  }
+
+  // ── Copy helpers ─────────────────────────────────────────────
+  function copyField(btn) {
+    const text = btn.getAttribute("data-copy");
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = "COPIED ✓";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "COPY"; btn.classList.remove("copied"); }, 1800);
+    });
+  }
+
+  function copyDesc(rowIndex) {
+    const pre = document.getElementById(`desc-${rowIndex}`);
+    if (!pre) return;
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      showToast("Description copied to clipboard", "info");
+    });
+  }
+
+  // ── Pending count ────────────────────────────────────────────
+  function updatePendingCount(delta) {
+    const el = document.getElementById("pending-count");
+    const current = parseInt(el.textContent) || 0;
+    const next = Math.max(0, current + delta);
+    el.textContent = next;
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────
+  let toastTimer = null;
+  function showToast(msg, type = "info") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = `show ${type}`;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.className = type; }, 3200);
+  }
+
+  // ── Error state ──────────────────────────────────────────────
+  function showFetchError(title, body) {
+    document.getElementById("fetch-error-title").textContent = title;
+    document.getElementById("fetch-error-body").textContent  = body;
+    show("fetch-error");
+  }
+
+  // ── DOM helpers ──────────────────────────────────────────────
+  function show(id) { document.getElementById(id).style.display = ""; }
+  function hide(id) { document.getElementById(id).style.display = "none"; }
+
+  function el(tag, cls) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    return e;
+  }
+
+  function esc(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function norm(str) {
+    return String(str ?? "").trim().toLowerCase();
+  }
+
+  function fmt(num) {
+    const n = parseFloat(num);
+    return isNaN(n) ? "—" : n % 1 === 0 ? n.toString() : n.toFixed(2);
+  }
+</script>
+</body>
+</html>

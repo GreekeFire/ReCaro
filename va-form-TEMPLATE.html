@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Researcher Submission — CHANGE_ME</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --border-focus: #444;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --text: #e8e8e8;
+    --muted: #666;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Header ── */
+  header { margin-bottom: 40px; }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  /* ── Progress pill ── */
+  .progress-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 16px;
+    min-width: 240px;
+  }
+
+  .progress-pill .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .progress-pill .count {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .progress-pill .slash { color: var(--muted); font-family: var(--mono); font-size: 14px; }
+  .progress-pill .target { font-family: var(--mono); font-size: 14px; color: var(--muted); }
+
+  .bar-outer {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    min-width: 60px;
+  }
+
+  .bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .met-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--green);
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.2);
+    padding: 2px 7px;
+    border-radius: 2px;
+    display: none;
+  }
+
+  /* ── Form card ── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 28px 32px;
+    margin-top: 32px;
+  }
+
+  .form-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field { margin-bottom: 20px; }
+
+  .field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 7px;
+  }
+
+  .field label .req { color: var(--accent); margin-left: 3px; }
+
+  .char-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+
+  .char-count.warn  { color: var(--yellow); }
+  .char-count.ok    { color: var(--green); }
+  .char-count.error { color: var(--red); }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 400;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: vertical;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder { color: #3a3a3a; }
+
+  .field input:focus,
+  .field textarea:focus { border-color: var(--border-focus); }
+
+  .field input.invalid,
+  .field textarea.invalid { border-color: rgba(239,68,68,0.5); }
+
+  .field textarea { min-height: 110px; line-height: 1.5; }
+
+  .field .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 5px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 480px) {
+    .field-row { grid-template-columns: 1fr; }
+    .form-card { padding: 20px 16px 24px; }
+  }
+
+  /* ── Submit button ── */
+  .submit-btn {
+    width: 100%;
+    margin-top: 8px;
+    background: var(--accent);
+    color: #000;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    text-transform: uppercase;
+  }
+
+  .submit-btn:hover:not(:disabled) { opacity: 0.88; }
+  .submit-btn:active:not(:disabled) { transform: scale(0.995); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Feedback banners ── */
+  .banner {
+    display: none;
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    border: 1px solid;
+  }
+
+  .banner.show { display: block; }
+
+  .banner-error {
+    background: rgba(239,68,68,0.07);
+    border-color: rgba(239,68,68,0.25);
+    color: #fca5a5;
+  }
+
+  .banner-success {
+    background: rgba(34,197,94,0.07);
+    border-color: rgba(34,197,94,0.25);
+    color: #86efac;
+  }
+
+  .banner strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .banner ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .banner ul li::before { content: "— "; opacity: 0.6; }
+
+  .success-detail {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(34,197,94,0.15);
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .success-detail .kv { font-family: var(--mono); font-size: 12px; }
+  .success-detail .kv .k { color: var(--muted); display: block; font-size: 10px; margin-bottom: 2px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .success-detail .kv .v { color: var(--green); font-size: 16px; font-weight: 700; }
+
+  /* ── Loading spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── VA code chip ── */
+  .va-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.2);
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-top: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .va-chip .dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <header>
+    <div class="header-tag">// RESEARCHER SUBMISSION FORM</div>
+    <h1>Submit a<br><span>product listing.</span></h1>
+    <p class="subtitle">Find a product on Shopee · Prepare your Drive folder · Submit below.</p>
+    <div class="va-chip">
+      <span class="dot"></span>
+      VA: <strong id="va-display">CHANGE_ME</strong>
+    </div>
+
+    <div class="progress-pill" id="progress-pill" style="margin-top:16px;">
+      <div>
+        <div class="label">Today</div>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span class="count" id="prog-done">—</span>
+          <span class="slash">/</span>
+          <span class="target" id="prog-target">—</span>
+        </div>
+      </div>
+      <div class="bar-outer">
+        <div class="bar-inner" id="prog-bar" style="width:0%"></div>
+      </div>
+      <div class="met-badge" id="met-badge">TARGET MET ✓</div>
+    </div>
+  </header>
+
+  <form class="form-card" id="submit-form" autocomplete="off" novalidate>
+    <div class="form-section-label">// Product Details</div>
+
+    <!-- Title -->
+    <div class="field">
+      <label for="title">
+        Product Title <span class="req">*</span>
+        <span class="char-count" id="title-count">0 / 225 words</span>
+      </label>
+      <input type="text" id="title" name="title" maxlength="100"
+        placeholder="e.g. Stainless Steel Kitchen Knife Set with Wooden Block (5pcs)">
+      <div class="hint">190–225 words. Be specific — include material, quantity, and key feature.</div>
+    </div>
+
+    <!-- Description -->
+    <div class="field">
+      <label for="description">
+        Product Description <span class="req">*</span>
+        <span class="char-count" id="desc-count">0 chars</span>
+      </label>
+      <textarea id="description" name="description" rows="5"
+        placeholder="Paste your AI-generated Carousell description here. Minimum 100 characters."></textarea>
+      <div class="hint">Use the AI prompt from the SOP to generate this. Min. 100 characters.</div>
+    </div>
+
+    <!-- Shopee Link + Source Cost -->
+    <div class="field-row">
+      <div class="field">
+        <label for="shopee-link">Shopee Link <span class="req">*</span></label>
+        <input type="url" id="shopee-link" name="shopeeLink"
+          placeholder="https://shopee.sg/...">
+        <div class="hint">Full product URL from Shopee.sg</div>
+      </div>
+      <div class="field">
+        <label for="source-cost">Source Cost (SGD) <span class="req">*</span></label>
+        <input type="number" id="source-cost" name="sourceCost" min="0.01" step="0.01"
+          placeholder="e.g. 12.50">
+        <div class="hint">Highest variant price on Shopee</div>
+      </div>
+    </div>
+
+    <!-- Drive Folder -->
+    <div class="field">
+      <label for="drive-folder">Google Drive Folder Link <span class="req">*</span></label>
+      <input type="url" id="drive-folder" name="driveFolder"
+        placeholder="https://drive.google.com/drive/folders/...">
+      <div class="hint">Shared folder containing 5–10 cleaned product images. Must be set to "Anyone with the link".</div>
+    </div>
+
+    <!-- Error / Success banners -->
+    <div class="banner banner-error" id="error-banner">
+      <strong>Submission rejected</strong>
+      <ul id="error-list"></ul>
+    </div>
+
+    <div class="banner banner-success" id="success-banner">
+      <strong>Submission received ✓</strong>
+      <div id="success-msg"></div>
+      <div class="success-detail" id="success-detail"></div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">Submit Product</button>
+  </form>
+
+</div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────────
+  const VA_CODE  = "CHANGE_ME";
+  const API_URL  = "https://script.google.com/macros/s/AKfycbxPVjsFvW5LXsPM38jsZjj5mGJb3CJN4pQ3r37zk_Zbh_g1vCnklgAj7B92zTlCRcgH/exec";
+
+  // ── DOM refs ──────────────────────────────────────────────────
+  const form        = document.getElementById("submit-form");
+  const submitBtn   = document.getElementById("submit-btn");
+  const errorBanner = document.getElementById("error-banner");
+  const errorList   = document.getElementById("error-list");
+  const successBanner = document.getElementById("success-banner");
+  const successMsg  = document.getElementById("success-msg");
+  const successDetail = document.getElementById("success-detail");
+
+  document.getElementById("va-display").textContent = VA_CODE;
+
+  // ── Character counters ────────────────────────────────────────
+  function wordCount(str) {
+    return str.trim() === "" ? 0 : str.trim().split(/\s+/).length;
+  }
+
+  function updateTitleCount() {
+    const el = document.getElementById("title");
+    const n  = wordCount(el.value);
+    const cc = document.getElementById("title-count");
+    cc.textContent = `${n} / 225 words`;
+    if (n === 0)           { cc.className = "char-count"; }
+    else if (n < 190)      { cc.className = "char-count warn"; }
+    else if (n <= 225)     { cc.className = "char-count ok"; }
+    else                   { cc.className = "char-count error"; }
+  }
+
+  function updateDescCount() {
+    const el = document.getElementById("description");
+    const n  = el.value.length;
+    const cc = document.getElementById("desc-count");
+    cc.textContent = `${n} chars`;
+    if (n === 0)      { cc.className = "char-count"; }
+    else if (n < 100) { cc.className = "char-count warn"; }
+    else              { cc.className = "char-count ok"; }
+  }
+
+  document.getElementById("title").addEventListener("input", updateTitleCount);
+  document.getElementById("description").addEventListener("input", updateDescCount);
+
+  // ── Progress loader ───────────────────────────────────────────
+  function loadProgress() {
+    const today = new Date().toISOString().slice(0, 10);
+    const url   = `${API_URL}?action=progress&va=${encodeURIComponent(VA_CODE)}&date=${today}`;
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        if (!data.ok) return;
+        const done   = data.submitted ?? 0;
+        const target = data.target    ?? 0;
+        const pct    = target ? Math.min(Math.round(done / target * 100), 100) : 0;
+
+        document.getElementById("prog-done").textContent   = done;
+        document.getElementById("prog-target").textContent = target || "—";
+        document.getElementById("prog-bar").style.width    = pct + "%";
+
+        if (target > 0 && done >= target) {
+          document.getElementById("met-badge").style.display = "block";
+        }
+      })
+      .catch(() => {/* silent — progress is informational */});
+  }
+
+  loadProgress();
+
+  // ── Client-side validation (mirrors server QC rules) ─────────
+  function validate() {
+    const title       = document.getElementById("title").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const shopeeLink  = document.getElementById("shopee-link").value.trim();
+    const sourceCost  = parseFloat(document.getElementById("source-cost").value);
+    const driveFolder = document.getElementById("drive-folder").value.trim();
+
+    const errors = [];
+
+    const titleWords = wordCount(title);
+    if (!title)                        errors.push("Title is required.");
+    else if (titleWords < 190)         errors.push(`Title is too short — ${titleWords} words, minimum 190.`);
+    else if (titleWords > 225)         errors.push(`Title is too long — ${titleWords} words, maximum 225.`);
+
+    if (!description)               errors.push("Description is required.");
+    else if (description.length < 100) errors.push("Description is too short — minimum 100 characters.");
+
+    if (!shopeeLink)                errors.push("Shopee link is required.");
+
+    if (!document.getElementById("source-cost").value.trim())
+                                    errors.push("Source cost is required.");
+    else if (isNaN(sourceCost) || sourceCost <= 0)
+                                    errors.push("Source cost must be a positive number.");
+
+    if (!driveFolder)               errors.push("Drive folder link is required.");
+    else if (!driveFolder.includes("drive.google.com"))
+                                    errors.push("Drive folder must be a Google Drive link.");
+
+    return errors;
+  }
+
+  // ── Show / hide banners ───────────────────────────────────────
+  function showError(msgs) {
+    errorList.innerHTML = msgs.map(m => `<li>${m}</li>`).join("");
+    errorBanner.classList.add("show");
+    successBanner.classList.remove("show");
+    errorBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function showSuccess(data) {
+    const sellPrice = typeof data.sellPrice === "number"
+      ? "$" + data.sellPrice.toFixed(2)
+      : "—";
+    const lister = data.lister || "—";
+
+    successMsg.textContent = "Your product has been added to the queue.";
+    successDetail.innerHTML =
+      `<div class="kv"><span class="k">Sell Price</span><span class="v">${sellPrice}</span></div>` +
+      `<div class="kv"><span class="k">Assigned To</span><span class="v">${lister}</span></div>`;
+
+    successBanner.classList.add("show");
+    errorBanner.classList.remove("show");
+    successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ── Form submission ───────────────────────────────────────────
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const clientErrors = validate();
+    if (clientErrors.length) { showError(clientErrors); return; }
+
+    const title       = document.getElementById("title").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const shopeeLink  = document.getElementById("shopee-link").value.trim();
+    const sourceCost  = document.getElementById("source-cost").value.trim();
+    const driveFolder = document.getElementById("drive-folder").value.trim();
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner"></span> Submitting…`;
+    errorBanner.classList.remove("show");
+    successBanner.classList.remove("show");
+
+    const params = new URLSearchParams({
+      action      : "submit",
+      vaCode      : VA_CODE,
+      title,
+      description,
+      shopeeLink,
+      sourceCost,
+      driveFolder,
+    });
+
+    try {
+      const res  = await fetch(`${API_URL}?${params.toString()}`);
+      const data = await res.json();
+
+      if (data.ok) {
+        form.reset();
+        updateTitleCount();
+        updateDescCount();
+        showSuccess(data);
+        loadProgress(); // refresh counter
+      } else {
+        const flags = data.qcFlags || [data.error];
+        showError(flags);
+      }
+    } catch (err) {
+      showError(["Network error — please check your connection and try again."]);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = "Submit Product";
+    }
+  });
+</script>
+</body>
+</html>

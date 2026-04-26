@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lister Trial Task</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --green: #22c55e;
+    --blue: #60a5fa;
+    --red: #ef4444;
+    --text: #e8e8e8;
+    --muted: #666;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 20px 100px;
+  }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .container { max-width: 780px; margin: 0 auto; position: relative; z-index: 1; }
+
+  header { margin-bottom: 40px; }
+
+  .header-tag {
+    font-family: var(--mono); font-size: 11px; color: var(--accent);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: var(--mono); font-size: clamp(22px, 4vw, 34px);
+    font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: #fff;
+  }
+  h1 span { color: var(--accent); }
+
+  .subtitle { margin-top: 10px; color: var(--muted); font-size: 14px; font-weight: 300; }
+
+  /* Progress dots */
+  .progress-wrap {
+    margin-top: 28px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 18px 22px; display: flex; align-items: center; gap: 20px;
+  }
+  .progress-label { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .progress-label span { font-size: 12px; color: var(--muted); font-weight: 400; display: block; margin-top: 2px; }
+  .dots { display: flex; gap: 10px; flex: 1; justify-content: center; }
+  .dot {
+    width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .dot.done { background: var(--green); border-color: var(--green); color: #000; }
+
+  /* Trial code */
+  .code-section {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 20px 24px; margin-bottom: 32px;
+  }
+  .code-section label {
+    font-family: var(--mono); font-size: 11px; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 10px;
+  }
+  .code-section input {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+    color: var(--text); font-family: var(--mono); font-size: 18px; font-weight: 700;
+    padding: 10px 14px; width: 160px; letter-spacing: 0.1em;
+  }
+  .code-section input:focus { outline: none; border-color: var(--accent); }
+  .code-section .hint { font-size: 12px; color: var(--muted); margin-top: 8px; font-weight: 300; }
+
+  /* Instructions */
+  .instructions {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 24px; margin-bottom: 36px;
+  }
+  .instructions h2 {
+    font-family: var(--mono); font-size: 12px; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .instructions ol { padding-left: 20px; }
+  .instructions li { font-size: 14px; line-height: 1.7; color: #ccc; margin-bottom: 4px; }
+  .instructions li strong { color: var(--text); }
+
+  .warning-box {
+    margin-top: 16px; padding: 12px 16px;
+    background: rgba(234,179,8,0.06); border: 1px solid rgba(234,179,8,0.2);
+    border-radius: 3px; font-size: 13px; color: #ccc; line-height: 1.6;
+  }
+  .warning-box strong { color: #eab308; }
+
+  /* Product brief cards */
+  .product-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; margin-bottom: 20px; overflow: hidden;
+    border-left: 3px solid var(--border); transition: border-color 0.2s;
+  }
+  .product-card.done { border-left-color: var(--green); }
+
+  .product-header {
+    display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+  }
+  .product-num {
+    font-family: var(--mono); font-size: 11px; color: var(--accent);
+    background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2);
+    padding: 3px 9px; border-radius: 3px; letter-spacing: 0.1em; flex-shrink: 0;
+  }
+  .product-title-display {
+    font-size: 14px; font-weight: 600; color: var(--text); flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .product-status {
+    font-family: var(--mono); font-size: 11px; color: var(--muted); flex-shrink: 0; letter-spacing: 0.05em;
+  }
+  .product-status.ok { color: var(--green); }
+
+  .brief {
+    padding: 20px; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  .brief-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .brief-row { grid-template-columns: 1fr; } }
+
+  .brief-field {}
+  .brief-label {
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px;
+  }
+  .brief-value {
+    font-size: 14px; color: var(--text); line-height: 1.5;
+  }
+  .brief-value.price {
+    font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--green);
+  }
+  .brief-value.desc {
+    font-size: 13px; color: #bbb; line-height: 1.6; white-space: pre-wrap;
+    max-height: 120px; overflow-y: auto;
+  }
+
+  .drive-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--blue); font-size: 13px; text-decoration: none;
+    font-family: var(--mono); padding: 6px 12px;
+    background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2);
+    border-radius: 3px; transition: all 0.15s; margin-top: 4px;
+  }
+  .drive-link:hover { background: rgba(96,165,250,0.14); }
+
+  .category-badge {
+    display: inline-block; font-family: var(--mono); font-size: 10px;
+    padding: 3px 8px; border-radius: 2px; letter-spacing: 0.06em;
+    background: rgba(249,115,22,0.1); color: var(--accent);
+    border: 1px solid rgba(249,115,22,0.2);
+  }
+
+  /* URL input section */
+  .url-section { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .url-section label {
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .url-input-wrap { display: flex; gap: 10px; align-items: center; }
+  .url-input-wrap input {
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+    color: var(--text); font-family: var(--mono); font-size: 13px;
+    padding: 10px 12px; transition: border-color 0.15s;
+  }
+  .url-input-wrap input:focus { outline: none; border-color: var(--accent); }
+  .url-input-wrap input::placeholder { color: var(--muted); }
+  .url-input-wrap input.valid { border-color: rgba(34,197,94,0.4); }
+  .url-input-wrap input.invalid { border-color: rgba(239,68,68,0.4); }
+  .url-hint { font-size: 12px; color: var(--muted); }
+  .url-hint.ok { color: var(--green); }
+  .url-hint.bad { color: var(--red); }
+
+  /* Submit */
+  .submit-section { margin-top: 32px; }
+  .submit-btn {
+    width: 100%; padding: 16px; background: var(--accent); color: #000;
+    border: none; border-radius: 4px; font-family: var(--mono); font-size: 13px;
+    font-weight: 700; letter-spacing: 0.08em; cursor: pointer; transition: all 0.15s;
+  }
+  .submit-btn:hover:not(:disabled) { background: var(--accent2); }
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .response {
+    margin-top: 16px; padding: 16px 20px; border-radius: 4px;
+    font-size: 14px; line-height: 1.5; display: none;
+  }
+  .response.ok  { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); color: var(--green); }
+  .response.err { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: var(--red); }
+
+  .done-state { text-align: center; padding: 60px 20px; display: none; }
+  .done-state .done-icon { font-size: 48px; margin-bottom: 16px; }
+  .done-state h2 { font-family: var(--mono); font-size: 22px; color: var(--green); margin-bottom: 10px; }
+  .done-state p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <header>
+    <div class="header-tag">// CAROUSELL RESELLING — LISTER TRIAL</div>
+    <h1>Trial Task<br><span>3-product listing</span></h1>
+    <p class="subtitle">List each product on your own Carousell account, then paste the URLs below.</p>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">0 / 3 URLs entered</span>
+      </div>
+      <div class="dots">
+        <div class="dot" id="dot-1">1</div>
+        <div class="dot" id="dot-2">2</div>
+        <div class="dot" id="dot-3">3</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Trial code -->
+  <div class="code-section">
+    <label>// Your Trial Code</label>
+    <input type="text" id="trial-code" placeholder="T001" maxlength="10"
+           style="text-transform:uppercase">
+    <p class="hint">Quinn sent this code to you when arranging the trial.</p>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <h2>// Instructions</h2>
+    <ol>
+      <li>For each product below, open the <strong>Drive folder</strong> and download all images.</li>
+      <li>Go to your <strong>own Carousell account</strong> and create a new listing.</li>
+      <li>Use the <strong>exact title, description, sell price, and category</strong> shown — do not modify them.</li>
+      <li>Upload <strong>all images</strong> from the Drive folder.</li>
+      <li>Once listed, copy the Carousell URL and paste it in the field below that product.</li>
+      <li>Submit when all 3 are done. Quinn will review your listings within 24 hours.</li>
+    </ol>
+
+    <div class="warning-box">
+      <strong>Important:</strong> After Quinn contacts you with the result, delist all 3 items from your Carousell account. Do not sell them — they are for assessment only.
+    </div>
+  </div>
+
+  <!-- Product cards (rendered by JS) -->
+  <div id="products"></div>
+
+  <!-- Submit -->
+  <div class="submit-section" id="submit-section">
+    <button class="submit-btn" id="submit-btn" disabled>Submit All 3 URLs</button>
+    <div class="response" id="response"></div>
+  </div>
+
+  <!-- Done state -->
+  <div class="done-state" id="done-state">
+    <div class="done-icon">✅</div>
+    <h2>Submission received</h2>
+    <p id="done-msg">Quinn will review your listings and contact you within 24 hours.<br>Remember to delist the 3 products from your Carousell account once contacted.</p>
+  </div>
+
+</div>
+
+<script>
+  // ── CONFIG — paste your Apps Script web app URL here ──────────────
+  const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+  // ─────────────────────────────────────────────────────────────────
+
+  // ── UPDATE THESE before sending to lister candidates ─────────────
+  // Replace placeholder values with real products.
+  // driveFolder: set sharing to "Anyone with the link" before sending.
+  const TRIAL_PRODUCTS = [
+    {
+      title       : "UPDATE — Exact product title to use on Carousell",
+      description : "UPDATE — Full Carousell listing description. Paste it here exactly as you want the candidate to use it.",
+      sellPrice   : 0,       // UPDATE — e.g. 35
+      category    : "UPDATE — e.g. Home Organisation",
+      driveFolder : "UPDATE — https://drive.google.com/drive/folders/FOLDER_ID_1",
+    },
+    {
+      title       : "UPDATE — Exact product title to use on Carousell",
+      description : "UPDATE — Full Carousell listing description. Paste it here exactly as you want the candidate to use it.",
+      sellPrice   : 0,       // UPDATE — e.g. 45
+      category    : "UPDATE — e.g. Kitchen Gadgets",
+      driveFolder : "UPDATE — https://drive.google.com/drive/folders/FOLDER_ID_2",
+    },
+    {
+      title       : "UPDATE — Exact product title to use on Carousell",
+      description : "UPDATE — Full Carousell listing description. Paste it here exactly as you want the candidate to use it.",
+      sellPrice   : 0,       // UPDATE — e.g. 25
+      category    : "UPDATE — e.g. Car Accessories",
+      driveFolder : "UPDATE — https://drive.google.com/drive/folders/FOLDER_ID_3",
+    },
+  ];
+  // ─────────────────────────────────────────────────────────────────
+
+  function renderProducts() {
+    const container = document.getElementById('products');
+    TRIAL_PRODUCTS.forEach((prod, idx) => {
+      const i = idx + 1;
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.id = `product-${i}`;
+      card.innerHTML = `
+        <div class="product-header">
+          <div class="product-num">PRODUCT ${i}</div>
+          <div class="product-title-display">${escHtml(prod.title)}</div>
+          <div class="product-status" id="pstatus-${i}">no URL yet</div>
+        </div>
+
+        <div class="brief">
+          <div class="brief-row">
+            <div class="brief-field">
+              <div class="brief-label">Sell Price — use exactly this</div>
+              <div class="brief-value price">$${prod.sellPrice}</div>
+            </div>
+            <div class="brief-field">
+              <div class="brief-label">Category</div>
+              <div class="brief-value"><span class="category-badge">${escHtml(prod.category)}</span></div>
+            </div>
+          </div>
+
+          <div class="brief-field">
+            <div class="brief-label">Title — copy exactly</div>
+            <div class="brief-value">${escHtml(prod.title)}</div>
+          </div>
+
+          <div class="brief-field">
+            <div class="brief-label">Description — copy exactly</div>
+            <div class="brief-value desc">${escHtml(prod.description)}</div>
+          </div>
+
+          <div class="brief-field">
+            <div class="brief-label">Images (Drive folder)</div>
+            <a href="${escHtml(prod.driveFolder)}" target="_blank" class="drive-link">
+              ↗ Open Drive folder — download all images
+            </a>
+          </div>
+        </div>
+
+        <div class="url-section">
+          <label>Your Carousell Listing URL</label>
+          <div class="url-input-wrap">
+            <input type="url" id="url${i}"
+                   placeholder="https://www.carousell.sg/p/..."
+                   oninput="onUrlInput(${i})">
+          </div>
+          <div class="url-hint" id="url-hint-${i}">Must start with https://www.carousell.sg/</div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function onUrlInput(i) {
+    const val    = document.getElementById(`url${i}`).value.trim();
+    const input  = document.getElementById(`url${i}`);
+    const hint   = document.getElementById(`url-hint-${i}`);
+    const status = document.getElementById(`pstatus-${i}`);
+    const card   = document.getElementById(`product-${i}`);
+
+    if (!val) {
+      input.className = '';
+      hint.className = 'url-hint';
+      hint.textContent = 'Must start with https://www.carousell.sg/';
+      status.textContent = 'no URL yet';
+      status.className = 'product-status';
+      card.classList.remove('done');
+    } else if (val.startsWith('https://www.carousell.sg/')) {
+      input.className = 'valid';
+      hint.className = 'url-hint ok';
+      hint.textContent = '✓ Valid Carousell URL';
+      status.textContent = '✓ ready';
+      status.className = 'product-status ok';
+      card.classList.add('done');
+    } else {
+      input.className = 'invalid';
+      hint.className = 'url-hint bad';
+      hint.textContent = '✗ Must start with https://www.carousell.sg/';
+      status.textContent = 'invalid URL';
+      status.className = 'product-status';
+      card.classList.remove('done');
+    }
+
+    updateProgress();
+  }
+
+  function updateProgress() {
+    let ready = 0;
+    for (let i = 1; i <= 3; i++) {
+      const val = (document.getElementById(`url${i}`)?.value || '').trim();
+      const ok  = val.startsWith('https://www.carousell.sg/');
+      document.getElementById(`dot-${i}`).className = 'dot' + (ok ? ' done' : '');
+      if (ok) ready++;
+    }
+    document.getElementById('progress-text').textContent = `${ready} / 3 URLs entered`;
+    document.getElementById('submit-btn').disabled = ready < 3;
+  }
+
+  async function submitForm() {
+    const trialCode = document.getElementById('trial-code').value.trim().toUpperCase();
+    if (!trialCode) {
+      showResponse(false, 'Please enter your trial code before submitting.');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.textContent = 'Submitting…';
+    btn.disabled = true;
+
+    const params = new URLSearchParams({ action: 'trialLister', trialCode });
+    TRIAL_PRODUCTS.forEach((prod, idx) => {
+      const i = idx + 1;
+      params.append(`givenTitle${i}`,  prod.title);
+      params.append(`givenPrice${i}`,  prod.sellPrice);
+      params.append(`carousellUrl${i}`, document.getElementById(`url${i}`).value.trim());
+    });
+
+    try {
+      const res  = await fetch(`${APPS_SCRIPT_URL}?${params}`);
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById('submit-section').style.display = 'none';
+        document.getElementById('products').style.display = 'none';
+        const doneEl = document.getElementById('done-state');
+        document.getElementById('done-msg').innerHTML =
+          (data.message || 'Quinn will review your listings and contact you within 24 hours.') +
+          '<br><br>Remember to delist the 3 products from your Carousell account once contacted.';
+        doneEl.style.display = 'block';
+      } else {
+        showResponse(false, data.message || data.error || 'Submission failed. Please try again.');
+        btn.textContent = 'Submit All 3 URLs';
+        btn.disabled = false;
+      }
+    } catch {
+      showResponse(false, 'Network error. Check your connection and try again.');
+      btn.textContent = 'Submit All 3 URLs';
+      btn.disabled = false;
+    }
+  }
+
+  function showResponse(ok, msg) {
+    const el = document.getElementById('response');
+    el.className = 'response ' + (ok ? 'ok' : 'err');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  document.getElementById('submit-btn').addEventListener('click', submitForm);
+  renderProducts();
+  updateProgress();
+</script>
+</body>
+</html>
